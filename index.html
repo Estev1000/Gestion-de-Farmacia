@@ -15,12 +15,18 @@
             <div class="header-content">
                 <h1>⚕️ Gestión de Farmacia</h1>
                 <p class="subtitle">Sistema de Control de Stock y Ventas</p>
+                <!-- Badge de Plan Activado -->
+                <span id="badgePlanActivo"
+                    style="display:none; background:#4CAF50; color:white; padding:6px 12px; border-radius:20px; font-size:0.85em; font-weight:600; margin-top:8px; display:inline-block;">
+                    ✅ Plan Gratis
+                </span>
             </div>
             <div class="header-actions">
                 <button id="btnVentasHeader" class="btn btn-info" title="Ver ventas totales (Ctrl+V)">
                     📊 Ver Caja
                 </button>
-                <button id="btnSoporte" class="btn btn-secondary" title="Contacto y Soporte" style="margin-left:8px;">🛟 Soporte</button>
+                <button id="btnSoporte" class="btn btn-secondary" title="Contacto y Soporte" style="margin-left:8px;">🛟
+                    Soporte</button>
                 <label for="selectRotacion" style="margin-left:10px; font-size:0.9rem;">Rotación:</label>
                 <select id="selectRotacion" title="Seleccionar método de rotación" style="margin-left:6px;">
                     <option value="FIFO">FIFO (por fecha de ingreso)</option>
@@ -198,6 +204,10 @@
                             <p>Inventario completo, ventas, export/import Excel, soporte por chat.</p>
                             <p><strong>Precio:</strong> $8.000 ARS / mes</p>
                             <button id="btnSuscribirBasico" class="btn btn-primary">Suscribir Básico</button>
+                            <button onclick="enterProCode()" class="btn btn-secondary"
+                                style="margin-top:8px; font-size:0.85em;">
+                                🔑 Activar con Código
+                            </button>
                         </div>
 
                         <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
@@ -205,6 +215,10 @@
                             <p>Incluye FIFO/FEFO, gestión por lotes, alertas y soporte prioritario.</p>
                             <p><strong>Precio:</strong> $15.000 ARS / mes</p>
                             <button id="btnSuscribirEstandar" class="btn btn-primary">Suscribir Estándar</button>
+                            <button onclick="enterProCode()" class="btn btn-secondary"
+                                style="margin-top:8px; font-size:0.85em;">
+                                🔑 Activar con Código
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -215,18 +229,32 @@
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Suscripción Premium</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h5 class="modal-title">👑 Suscripción Premium</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close">✕</button>
                         </div>
                         <div class="modal-body text-center p-4">
                             <h3>Confirmar suscripción</h3>
                             <p class="mb-2">Serás redirigido a Mercado Pago para completar el pago.</p>
-                            <div class="premium-price" style="font-size:1.5rem; font-weight:bold; margin-bottom:12px;">$--</div>
-                            <div class="d-grid gap-2" style="max-width:320px; margin:0 auto;">
-                                <a class="btn btn-primary mp-pay-link" href="#" target="_blank" style="background:#009ee3; border:none;">Pagar con Mercado Pago</a>
-                                <button class="btn btn-outline-secondary mp-copy-btn" type="button">Copiar link</button>
+                            <div class="premium-price">$--</div>
+                            <div class="d-grid gap-2" style="max-width:400px; margin:0 auto;">
+                                <a class="btn btn-primary mp-pay-link" href="#" target="_blank">
+                                    💳 Pagar con Mercado Pago
+                                </a>
+                                <button class="btn btn-outline-secondary mp-copy-btn" type="button">
+                                    📋 Copiar link
+                                </button>
                             </div>
-                            <p class="text-muted small mt-3">Una vez completado el pago, serás redirigido y tu acceso quedará activo en este dispositivo.</p>
+                            <p class="text-muted small mt-3">Una vez completado el pago, serás redirigido y tu acceso
+                                quedará activo en este dispositivo.</p>
+
+                            <!-- Sección de Código de Activación -->
+                            <div class="mt-4 pt-3" style="border-top: 2px solid #e0e0e0;">
+                                <p class="text-muted small mb-2">¿Ya tienes una licencia?</p>
+                                <button class="btn btn-outline-warning btn-sm" onclick="enterProCode()" type="button">
+                                    🔑 Ingresar Código de Activación
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -238,15 +266,19 @@
                     <p>Contactanos por WhatsApp o envíanos un correo.</p>
 
                     <div style="display:flex; gap:8px; margin-bottom:10px;">
-                        <a id="supportWhatsapp" href="https://wa.me/5492664024390" target="_blank" class="btn btn-success">💬 Chat por WhatsApp</a>
+                        <a id="supportWhatsapp" href="https://wa.me/5492664024390" target="_blank"
+                            class="btn btn-success">💬 Chat por WhatsApp</a>
                         <button id="supportCopyLink" class="btn btn-secondary">🔗 Copiar link de soporte</button>
                     </div>
 
                     <div style="text-align:left;">
                         <p style="font-size:0.9rem;"><strong>O envíanos un mensaje (Formulario):</strong></p>
                         <form id="formSupport" action="https://formspree.io/f/mvgzqkpv" method="POST" target="_blank">
-                            <div style="margin-bottom:6px;"><input type="email" name="email" placeholder="Tu email" required style="width:100%; padding:6px;"></div>
-                            <div style="margin-bottom:6px;"><textarea name="message" placeholder="Escribe tu consulta aquí..." rows="4" required style="width:100%; padding:6px;"></textarea></div>
+                            <div style="margin-bottom:6px;"><input type="email" name="email" placeholder="Tu email"
+                                    required style="width:100%; padding:6px;"></div>
+                            <div style="margin-bottom:6px;"><textarea name="message"
+                                    placeholder="Escribe tu consulta aquí..." rows="4" required
+                                    style="width:100%; padding:6px;"></textarea></div>
                             <div style="margin-top:8px; display:flex; gap:8px;">
                                 <button type="submit" class="btn btn-primary">Enviar mensaje</button>
                                 <button type="button" id="supportClose" class="btn btn-secondary">Cerrar</button>
@@ -254,7 +286,8 @@
                         </form>
                     </div>
 
-                    <p class="small text-muted" style="margin-top:12px;">Soporte: WhatsApp y formulario conectados (Formspree).</p>
+                    <p class="small text-muted" style="margin-top:12px;">Soporte: WhatsApp y formulario conectados
+                        (Formspree).</p>
                 </div>
             </div>
         </div>
