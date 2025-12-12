@@ -20,6 +20,7 @@
                 <button id="btnVentasHeader" class="btn btn-info" title="Ver ventas totales (Ctrl+V)">
                     📊 Ver Caja
                 </button>
+                <button id="btnSoporte" class="btn btn-secondary" title="Contacto y Soporte" style="margin-left:8px;">🛟 Soporte</button>
                 <label for="selectRotacion" style="margin-left:10px; font-size:0.9rem;">Rotación:</label>
                 <select id="selectRotacion" title="Seleccionar método de rotación" style="margin-left:6px;">
                     <option value="FIFO">FIFO (por fecha de ingreso)</option>
@@ -228,6 +229,32 @@
                             <p class="text-muted small mt-3">Una vez completado el pago, serás redirigido y tu acceso quedará activo en este dispositivo.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+            <!-- Modal Soporte -->
+            <div id="modalSupport" class="modal">
+                <div class="modal-content">
+                    <h2><i class="fas fa-headset"></i> Soporte y Contacto</h2>
+                    <p>Contactanos por WhatsApp o envíanos un correo.</p>
+
+                    <div style="display:flex; gap:8px; margin-bottom:10px;">
+                        <a id="supportWhatsapp" href="https://wa.me/5492664024390" target="_blank" class="btn btn-success">💬 Chat por WhatsApp</a>
+                        <button id="supportCopyLink" class="btn btn-secondary">🔗 Copiar link de soporte</button>
+                    </div>
+
+                    <div style="text-align:left;">
+                        <p style="font-size:0.9rem;"><strong>O envíanos un mensaje (Formulario):</strong></p>
+                        <form id="formSupport" action="https://formspree.io/f/mvgzqkpv" method="POST" target="_blank">
+                            <div style="margin-bottom:6px;"><input type="email" name="email" placeholder="Tu email" required style="width:100%; padding:6px;"></div>
+                            <div style="margin-bottom:6px;"><textarea name="message" placeholder="Escribe tu consulta aquí..." rows="4" required style="width:100%; padding:6px;"></textarea></div>
+                            <div style="margin-top:8px; display:flex; gap:8px;">
+                                <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+                                <button type="button" id="supportClose" class="btn btn-secondary">Cerrar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <p class="small text-muted" style="margin-top:12px;">Soporte: WhatsApp y formulario conectados (Formspree).</p>
                 </div>
             </div>
         </div>
