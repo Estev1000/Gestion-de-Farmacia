@@ -197,6 +197,37 @@ class FarmaciaApp {
         if (this.elementos.btnSuscribirBasico) this.elementos.btnSuscribirBasico.addEventListener('click', () => this.suscribirPlan('basic'));
         if (this.elementos.btnSuscribirEstandar) this.elementos.btnSuscribirEstandar.addEventListener('click', () => this.suscribirPlan('standard'));
         if (this.elementos.btnSuscribirGratis) this.elementos.btnSuscribirGratis.addEventListener('click', () => this.suscribirPlan('free'));
+        // Soporte
+        this.elementos.btnSoporte = document.getElementById('btnSoporte');
+        if (this.elementos.btnSoporte) this.elementos.btnSoporte.addEventListener('click', () => {
+            const modal = document.getElementById('modalSupport');
+            if (modal) modal.classList.add('active');
+        });
+
+        // Soporte: formulario que envía a Formspree y botones de copia/WhatsApp
+        const formSupport = document.getElementById('formSupport');
+        if (formSupport) {
+            formSupport.addEventListener('submit', () => {
+                // dejar que el formulario se envíe normalmente (target=_blank)
+                setTimeout(() => {
+                    const modal = document.getElementById('modalSupport');
+                    if (modal) modal.classList.remove('active');
+                    this.mostrarInfo('Gracias. Se abrió una nueva pestaña para enviar tu mensaje.');
+                }, 300);
+            });
+        }
+
+        // Copiar link de soporte (Formspree) y cerrar modal
+        const copyBtn = document.getElementById('supportCopyLink');
+        if (copyBtn) copyBtn.addEventListener('click', () => {
+            const link = 'https://formspree.io/f/mvgzqkpv';
+            navigator.clipboard.writeText(link).then(() => alert('Link de soporte copiado al portapapeles'));
+        });
+        const closeSupport = document.getElementById('supportClose');
+        if (closeSupport) closeSupport.addEventListener('click', () => {
+            const modal = document.getElementById('modalSupport');
+            if (modal) modal.classList.remove('active');
+        });
 
         // Cerrar modales al hacer click fuera
         [this.elementos.modalConfirmacion, this.elementos.modalInfo, this.elementos.modalError].forEach(modal => {
@@ -797,8 +828,9 @@ class FarmaciaApp {
 
         // Flujo cliente (igual que en Software para Gimnasios): abrimos modal con Smart-Link
         const planLinks = {
-            'basic': { url: 'https://mpago.la/REEMPLAZA_BASIC', priceLabel: '$8.000 ARS' },
-            'standard': { url: 'https://mpago.la/REEMPLAZA_STANDARD', priceLabel: '$15.000 ARS' }
+            // Smart-Links proporcionados por el usuario (Mercado Pago)
+            'basic': { url: 'https://mpago.la/1AbS4Y7', priceLabel: '$8.000 ARS' },
+            'standard': { url: 'https://mpago.la/22tnU3W', priceLabel: '$15.000 ARS' }
         };
 
         const plan = planLinks[planId];
