@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Farmacia - Versión Web</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Encabezado -->
+        <header class="header">
+            <div class="header-content">
+                <h1>⚕️ Gestión de Farmacia</h1>
+                <p class="subtitle">Sistema de Control de Stock y Ventas</p>
+            </div>
+            <div class="header-actions">
+                <button id="btnVentasHeader" class="btn btn-info" title="Ver ventas totales (Ctrl+V)">
+                    📊 Ver Caja
+                </button>
+                <label for="selectRotacion" style="margin-left:10px; font-size:0.9rem;">Rotación:</label>
+                <select id="selectRotacion" title="Seleccionar método de rotación" style="margin-left:6px;">
+                    <option value="FIFO">FIFO (por fecha de ingreso)</option>
+                    <option value="FEFO">FEFO (por fecha de vencimiento)</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Barra de herramientas -->
+        <nav class="toolbar">
+            <button id="btnVerVentas" class="btn btn-info" title="Ver ventas totales">
+                📊 Ver Caja Diaria
+            </button>
+            <button id="btnImprimirTicket" class="btn btn-warning" title="Imprimir ticket">
+                🖨️ Imprimir Último Ticket
+            </button>
+        </nav>
+
+        <!-- Contenido principal con pestañas -->
+        <div class="tabs-container">
+            <!-- Botones de pestañas -->
+            <div class="tabs-buttons">
+                <button class="tab-button active" data-tab="tab-inventario">📦 Inventario</button>
+                <button class="tab-button" data-tab="tab-ventas">💊 Nueva Venta</button>
+                <button class="tab-button" data-tab="tab-suscripcion">💳 Suscripción</button>
+            </div>
+
+            <!-- PESTAÑA: INVENTARIO -->
+            <div id="tab-inventario" class="tab-content active">
+                <section class="section">
+                    <h2>📦 Gestión de Productos</h2>
+                    <p class="section-subtitle">Agrega o modifica productos del catálogo:</p>
+
+                    <div class="form-grid-products">
+                        <div class="form-group">
+                            <label for="prodNombre">Nombre del Producto:</label>
+                            <input type="text" id="prodNombre" placeholder="Ej: Paracetamol 500mg" class="input-large">
+                        </div>
+                        <div class="form-group">
+                            <label for="prodPrecio">Precio:</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="prodPrecio" placeholder="0.00">
+                                <span class="currency">$</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="prodStock">Stock Inicial:</label>
+                            <input type="number" id="prodStock" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="prodLote">Número de Lote (opcional):</label>
+                            <input type="text" id="prodLote" placeholder="Ej: LOTE-2025-01">
+                        </div>
+                        <div class="form-group">
+                            <label for="prodVencimiento">Fecha de Vencimiento (opcional):</label>
+                            <input type="date" id="prodVencimiento">
+                        </div>
+                        <div class="form-group button-group">
+                            <button id="btnAgregarProducto" class="btn btn-success">
+                                ➕ Agregar Producto
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Excel Toolbar (Added back) -->
+                    <div class="toolbar-excel" style="margin-bottom: 20px; display: flex; gap: 10px;">
+                        <button id="btnImportarExcel" class="btn btn-secondary">📂 Importar Excel</button>
+                        <button id="btnExportarExcel" class="btn btn-success">💾 Exportar Excel</button>
+                        <button id="btnAumentoMasivo" class="btn btn-warning">📈 Aumento %</button>
+                        <button id="btnReduccionMasiva" class="btn btn-warning">📉 Reducción %</button>
+                        <input type="file" id="inputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
+                    </div>
+
+                    <div class="tabla-container">
+                        <h3>Catálogo Actual</h3>
+                        <table id="tablaProductos" class="tabla-general">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaProductos">
+                                <!-- Se llena dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PESTAÑA: VENTAS -->
+            <div id="tab-ventas" class="tab-content">
+                <section class="section">
+                    <h2>🛒 Realizar Venta</h2>
+
+                    <div class="venta-controls">
+                        <div class="form-group search-group">
+                            <label for="selectProductoVenta">Buscar Producto:</label>
+                            <select id="selectProductoVenta" class="input-large">
+                                <option value="">Seleccione un producto...</option>
+                            </select>
+                        </div>
+                        <div class="form-group quantity-group">
+                            <label for="cantidadVenta">Cantidad:</label>
+                            <input type="number" id="cantidadVenta" value="1" min="1" style="width: 80px;">
+                        </div>
+                        <div class="form-group button-group">
+                            <button id="btnAgregarCarrito" class="btn btn-success">
+                                ⬇️ Agregar
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Tabla del carrito -->
+                <section class="section">
+                    <h2>🛍️ Detalle de Venta</h2>
+
+                    <div class="tabla-container">
+                        <table id="tablaCarrito" class="tabla-carrito">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cant.</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Subtotal</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaCarrito">
+                            </tbody>
+                            <tfoot>
+                                <tr class="total-row">
+                                    <td colspan="3" style="text-align: right;"><strong>TOTAL:</strong></td>
+                                    <td id="totalCarrito">$0.00</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <div id="carritoVacio" class="carrito-vacio">
+                            <p>El carrito está vacío</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Botones finales -->
+                <section class="section botones-finales">
+                    <button id="btnFinalizarCompra" class="btn btn-success btn-large">
+                        ✅ Cobrar e Imprimir
+                    </button>
+                    <button id="btnCancelarCompra" class="btn btn-secondary btn-large">
+                        ❌ Cancelar
+                    </button>
+                </section>
+            </div>
+
+            <!-- PESTAÑA: SUSCRIPCIÓN -->
+            <div id="tab-suscripcion" class="tab-content">
+                <section class="section">
+                    <h2>💳 Planes y Suscripción</h2>
+                    <p class="section-subtitle">Elija un plan mensual. Existe una opción gratuita con limitaciones.</p>
+
+                    <div class="planes-grid" style="display:flex; gap:16px; margin-top:12px;">
+                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
+                            <h3>Gratis (limitado)</h3>
+                            <p>Funciones básicas: inventario y ventas (limitado a 50 productos).</p>
+                            <p><strong>Precio:</strong> $0 / mes</p>
+                            <button id="btnSuscribirGratis" class="btn">Seleccionar Gratis</button>
+                        </div>
+
+                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
+                            <h3>Básico</h3>
+                            <p>Inventario completo, ventas, export/import Excel, soporte por chat.</p>
+                            <p><strong>Precio:</strong> $8.000 ARS / mes</p>
+                            <button id="btnSuscribirBasico" class="btn btn-primary">Suscribir Básico</button>
+                        </div>
+
+                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
+                            <h3>Estándar</h3>
+                            <p>Incluye FIFO/FEFO, gestión por lotes, alertas y soporte prioritario.</p>
+                            <p><strong>Precio:</strong> $15.000 ARS / mes</p>
+                            <button id="btnSuscribirEstandar" class="btn btn-primary">Suscribir Estándar</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Modal Premium (Smart-Link) -->
+            <div class="modal fade" id="modalPremium" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Suscripción Premium</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center p-4">
+                            <h3>Confirmar suscripción</h3>
+                            <p class="mb-2">Serás redirigido a Mercado Pago para completar el pago.</p>
+                            <div class="premium-price" style="font-size:1.5rem; font-weight:bold; margin-bottom:12px;">$--</div>
+                            <div class="d-grid gap-2" style="max-width:320px; margin:0 auto;">
+                                <a class="btn btn-primary mp-pay-link" href="#" target="_blank" style="background:#009ee3; border:none;">Pagar con Mercado Pago</a>
+                                <button class="btn btn-outline-secondary mp-copy-btn" type="button">Copiar link</button>
+                            </div>
+                            <p class="text-muted small mt-3">Una vez completado el pago, serás redirigido y tu acceso quedará activo en este dispositivo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <!-- Modal de confirmación -->
+    <div id="modalConfirmacion" class="modal">
+        <div class="modal-content">
+            <h2 id="tituloConfirmacion">Confirmación</h2>
+            <p id="textoConfirmacion"></p>
+            <div class="modal-buttons">
+                <button id="btnConfirmarSi" class="btn btn-success">Sí, confirmar</button>
+                <button id="btnConfirmarNo" class="btn btn-secondary">No, cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de información -->
+    <div id="modalInfo" class="modal">
+        <div class="modal-content">
+            <h2 id="tituloInfo">Información</h2>
+            <p id="textoInfo"></p>
+            <div class="modal-buttons">
+                <button id="btnCerrarInfo" class="btn btn-success">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="modalError" class="modal">
+        <div class="modal-content error-content">
+            <h2>❌ Error</h2>
+            <p id="textoError"></p>
+            <div class="modal-buttons">
+                <button id="btnCerrarError" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
