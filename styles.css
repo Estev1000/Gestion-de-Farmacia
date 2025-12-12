@@ -456,3 +456,240 @@ tr:last-child td {
         opacity: 1;
     }
 }
+
+/* ============================================
+   MODAL PREMIUM - ESTILOS MEJORADOS
+   ============================================ */
+
+#modalPremium .modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+}
+
+#modalPremium .modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#modalPremium .modal-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #008f5b 100%);
+    color: white;
+    padding: 25px 30px;
+    border-bottom: none;
+}
+
+#modalPremium .modal-title {
+    font-size: 1.5em;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#modalPremium .modal-body {
+    padding: 40px 30px;
+}
+
+#modalPremium h3 {
+    color: var(--color-text);
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+#modalPremium .premium-price {
+    font-size: 2.5em;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 20px 0;
+    text-shadow: 0 2px 4px rgba(0, 168, 107, 0.1);
+}
+
+#modalPremium .mp-pay-link {
+    background: #009ee3 !important;
+    color: white !important;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 158, 227, 0.3);
+}
+
+#modalPremium .mp-pay-link:hover {
+    background: #0088cc !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 158, 227, 0.4);
+}
+
+#modalPremium .mp-copy-btn {
+    background: #6c757d;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+#modalPremium .mp-copy-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+#modalPremium .d-grid {
+    display: grid;
+    gap: 12px;
+}
+
+/* Sección de Código de Activación */
+#modalPremium .mt-4 {
+    margin-top: 30px;
+}
+
+#modalPremium .pt-3 {
+    padding-top: 20px;
+}
+
+#modalPremium .btn-outline-warning {
+    background: transparent;
+    color: #ff9800;
+    border: 2px solid #ff9800;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#modalPremium .btn-outline-warning:hover {
+    background: #ff9800;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+#modalPremium .text-muted {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+#modalPremium .small {
+    font-size: 0.875em;
+}
+
+/* Botón cerrar mejorado */
+#modalPremium .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5em;
+    color: white;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+}
+
+#modalPremium .btn-close:hover {
+    opacity: 1;
+}
+
+/* Animación de entrada del modal */
+#modalPremium.fade .modal-dialog {
+    transition: transform 0.3s ease-out;
+    transform: translate(0, -50px);
+}
+
+#modalPremium.show .modal-dialog {
+    transform: none;
+}
+
+/* Planes Grid */
+.planes-grid {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.plan-card {
+    border: 2px solid #dce1e5;
+    padding: 20px;
+    width: 240px;
+    border-radius: 12px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.plan-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 16px rgba(0, 168, 107, 0.15);
+    transform: translateY(-3px);
+}
+
+.plan-card h3 {
+    color: var(--color-primary);
+    font-size: 1.3em;
+    margin-bottom: 12px;
+}
+
+.plan-card p {
+    color: var(--color-text-light);
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.plan-card strong {
+    color: var(--color-text);
+}
+
+.plan-card .btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+@media (max-width: 768px) {
+    .planes-grid {
+        flex-direction: column;
+    }
+
+    .plan-card {
+        width: 100%;
+    }
+
+    #modalPremium .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    #modalPremium .modal-body {
+        padding: 25px 20px;
+    }
+
+    #modalPremium .premium-price {
+        font-size: 2em;
+    }
+}
