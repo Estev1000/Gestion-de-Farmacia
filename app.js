@@ -353,7 +353,7 @@ class FarmaciaApp {
         }
 
         let restante = cantidad;
-        for (let i = 0; i < producto.lotes.length && restante > 0; ) {
+        for (let i = 0; i < producto.lotes.length && restante > 0;) {
             const lote = producto.lotes[i];
             const disponible = lote.cantidad || 0;
             if (disponible <= 0) {
@@ -866,26 +866,113 @@ class FarmaciaApp {
     // Verificar estado premium desde URL o localStorage al iniciar
     checkPremiumStatus() {
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('access') === 'farmacia_pro_2025') {
-            localStorage.setItem('farmacia_premium_active', 'true');
-            // limpiar URL
+        const accessCode = urlParams.get('access');
+
+        // Verificar códigos de activación desde URL
+        if (accessCode === 'farmacia_basic_2025') {
+            localStorage.setItem('farmacia_premium_active', 'basic');
+            localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
             window.history.replaceState({}, document.title, window.location.pathname);
-            this.mostrarInfo('¡Pago Exitoso! Versión PRO activada.');
+            this.mostrarInfo('¡Pago Exitoso! Plan <strong>Básico</strong> activado. 🎉');
+        } else if (accessCode === 'farmacia_pro_2025') {
+            localStorage.setItem('farmacia_premium_active', 'pro');
+            localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            this.mostrarInfo('¡Pago Exitoso! Plan <strong>Pro</strong> activado. 🚀');
         }
 
-        if (localStorage.getItem('farmacia_premium_active') === 'true') {
-            // Deshabilitar botones de suscripción
-            if (this.elementos.btnSuscribirBasico) {
-                this.elementos.btnSuscribirBasico.textContent = 'PRO ACTIVADO';
-                this.elementos.btnSuscribirBasico.disabled = true;
+        const premiumStatus = localStorage.getItem('farmacia_premium_active');
+        const premiumPlan = localStorage.getItem('farmacia_premium_plan') || 'PRO';
+
+        // Actualizar badge en el header
+        const badge = document.getElementById('badgePlanActivo');
+
+        if (premiumStatus === 'basic') {
+            // Actualizar badge
+            if (badge) {
+                badge.textContent = '✅ Plan Básico Activado';
+                badge.style.display = 'inline-block';
+                badge.style.background = '#4CAF50';
             }
+            // Solo actualizar botón Básico
+            if (this.elementos.btnSuscribirBasico) {
+                this.elementos.btnSuscribirBasico.innerHTML = `✅ ${premiumPlan}`;
+                this.elementos.btnSuscribirBasico.disabled = true;
+                this.elementos.btnSuscribirBasico.classList.remove('btn-primary');
+                this.elementos.btnSuscribirBasico.classList.add('btn-success');
+            }
+        } else if (premiumStatus === 'pro' || premiumStatus === 'true') {
+            // Actualizar badge
+            if (badge) {
+                badge.textContent = '✅ Plan Pro Activado';
+                badge.style.display = 'inline-block';
+                badge.style.background = '#FF9800';
+            }
+            // Solo actualizar botón Estándar/Pro
             if (this.elementos.btnSuscribirEstandar) {
-                this.elementos.btnSuscribirEstandar.textContent = 'PRO ACTIVADO';
+                this.elementos.btnSuscribirEstandar.innerHTML = `✅ ${premiumPlan}`;
                 this.elementos.btnSuscribirEstandar.disabled = true;
+                this.elementos.btnSuscribirEstandar.classList.remove('btn-primary');
+                this.elementos.btnSuscribirEstandar.classList.add('btn-success');
+            }
+        } else {
+            // Sin plan activado - ocultar badge
+            if (badge) {
+                badge.style.display = 'none';
             }
         }
     }
 }
+
+// ============================================
+// FUNCIÓN GLOBAL: ACTIVACIÓN DIRECTA CON CÓDIGO
+// ============================================
+window.activarConCodigo = function (code) {
+    if (!code) {
+        alert("❌ Error: Código no proporcionado.");
+        return;
+    }
+
+    // Validar y activar según el código
+    if (code === 'farmacia_basic_2025') {
+        localStorage.setItem('farmacia_premium_active', 'basic');
+        localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
+        alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nLa página se recargará para aplicar los cambios.");
+        location.reload();
+    } else if (code === 'farmacia_pro_2025') {
+        localStorage.setItem('farmacia_premium_active', 'pro');
+        localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
+        alert("¡Felicidades! Plan PRO Activado. 🚀\n\nLa página se recargará para aplicar los cambios.");
+        location.reload();
+    } else {
+        alert("❌ Código inválido: " + code);
+    }
+};
+
+// ============================================
+// FUNCIÓN GLOBAL: ACTIVACIÓN POR CÓDIGO MANUAL
+// ============================================
+window.enterProCode = function () {
+    const code = prompt("Ingresa tu código de activación:");
+    if (!code) return;
+
+    const codeTrimmed = code.trim();
+
+    // Validar códigos de activación
+    if (codeTrimmed === 'farmacia_basic_2025') {
+        localStorage.setItem('farmacia_premium_active', 'basic');
+        localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
+        alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nRecarga la página para aplicar los cambios.");
+        location.reload();
+    } else if (codeTrimmed === 'farmacia_pro_2025') {
+        localStorage.setItem('farmacia_premium_active', 'pro');
+        localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
+        alert("¡Felicidades! Plan PRO Activado. 🚀\n\nRecarga la página para aplicar los cambios.");
+        location.reload();
+    } else {
+        alert("❌ Código inválido.\n\nVerifica que hayas ingresado el código correctamente.");
+    }
+};
 
 // Iniciar
 document.addEventListener('DOMContentLoaded', () => {
