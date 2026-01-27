@@ -25,13 +25,23 @@
                 <button id="btnVentasHeader" class="btn btn-info" title="Ver ventas totales (Ctrl+V)">
                     📊 Ver Caja
                 </button>
-                <button id="btnSoporte" class="btn btn-secondary" title="Contacto y Soporte" style="margin-left:8px;">🛟
-                    Soporte</button>
-                <label for="selectRotacion" style="margin-left:10px; font-size:0.9rem;">Rotación:</label>
-                <select id="selectRotacion" title="Seleccionar método de rotación" style="margin-left:6px;">
-                    <option value="FIFO">FIFO (por fecha de ingreso)</option>
-                    <option value="FEFO">FEFO (por fecha de vencimiento)</option>
-                </select>
+                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                    <button id="btnSoporte" class="btn btn-secondary" title="Contacto y Soporte">🛟 Soporte</button>
+                    <a href="https://wa.me/5492664024390" target="_blank"
+                        style="color: #fff; font-size: 0.75rem; text-decoration: none; display: flex; align-items: center; gap: 4px; opacity: 0.9;">
+                        <span style="background: #25D366; width: 8px; height: 8px; border-radius: 50%;"></span> +54 9
+                        266 402-4390
+                    </a>
+                </div>
+                <div
+                    style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; margin-left: 10px;">
+                    <label for="selectRotacion" style="font-size:0.75rem; opacity: 0.9;">Rotación:</label>
+                    <select id="selectRotacion" title="Seleccionar método de rotación"
+                        style="padding: 4px; font-size: 0.85rem;">
+                        <option value="FIFO">FIFO (Ingreso)</option>
+                        <option value="FEFO">FEFO (Vencimiento)</option>
+                    </select>
+                </div>
             </div>
         </header>
 
@@ -84,7 +94,7 @@
                         </div>
                         <div class="form-group">
                             <label for="prodLote">Número de Lote (opcional):</label>
-                            <input type="text" id="prodLote" placeholder="Ej: LOTE-2025-01">
+                            <input type="text" id="prodLote" placeholder="Ej: LOTE-2026-01">
                         </div>
                         <div class="form-group">
                             <label for="prodVencimiento">Fecha de Vencimiento (opcional):</label>
@@ -218,35 +228,59 @@
                     <h2>💳 Planes y Suscripción</h2>
                     <p class="section-subtitle">Elija un plan mensual. Existe una opción gratuita con limitaciones.</p>
 
-                    <div class="planes-grid" style="display:flex; gap:16px; margin-top:12px;">
-                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
-                            <h3>Gratis (limitado)</h3>
-                            <p>Funciones básicas: inventario y ventas (limitado a 50 productos).</p>
-                            <p><strong>Precio:</strong> $0 / mes</p>
-                            <button id="btnSuscribirGratis" class="btn">Seleccionar Gratis</button>
+                    <div class="planes-grid" style="display:flex; gap:16px; margin-top:12px; flex-wrap: wrap;">
+                        <div class="plan-card"
+                            style="border:1px solid #ddd; padding:20px; width:280px; border-radius: 8px; background: #fff; box-shadow: var(--shadow);">
+                            <h3 style="color: var(--color-text); margin-bottom: 10px;">Gratis (limitado)</h3>
+                            <p style="font-size: 0.9em; color: var(--color-text-light); margin-bottom: 15px;">Funciones
+                                básicas: inventario y ventas (limitado a 50 productos).</p>
+                            <p style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px;">$0 / mes</p>
+                            <button id="btnSuscribirGratis" class="btn"
+                                style="width: 100%; border: 1px solid #ccc;">Seleccionar Gratis</button>
                         </div>
 
-                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
-                            <h3>Básico</h3>
-                            <p>Inventario completo, ventas, export/import Excel, soporte por chat.</p>
-                            <p><strong>Precio:</strong> $8.000 ARS / mes</p>
-                            <button id="btnSuscribirBasico" class="btn btn-primary">Suscribir Básico</button>
+                        <div class="plan-card"
+                            style="border:2px solid var(--color-primary); padding:20px; width:280px; border-radius: 8px; background: #fff; box-shadow: var(--shadow);">
+                            <h3 style="color: var(--color-primary); margin-bottom: 10px;">Básico</h3>
+                            <p style="font-size: 0.9em; color: var(--color-text-light); margin-bottom: 15px;">Inventario
+                                completo, ventas, export/import Excel, soporte por chat.</p>
+                            <p style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px;">$8.000 ARS / mes</p>
+                            <button id="btnSuscribirBasico" class="btn btn-primary" style="width: 100%;">Suscribir
+                                Básico</button>
                             <button onclick="enterProCode()" class="btn btn-secondary"
-                                style="margin-top:8px; font-size:0.85em;">
+                                style="margin-top:8px; font-size:0.85em; width: 100%;">
                                 🔑 Activar con Código
                             </button>
                         </div>
 
-                        <div class="plan-card" style="border:1px solid #ddd; padding:12px; width:240px;">
-                            <h3>Estándar</h3>
-                            <p>Incluye FIFO/FEFO, gestión por lotes, alertas y soporte prioritario.</p>
-                            <p><strong>Precio:</strong> $15.000 ARS / mes</p>
-                            <button id="btnSuscribirEstandar" class="btn btn-primary">Suscribir Estándar</button>
+                        <div class="plan-card"
+                            style="border:2px solid var(--color-warning); padding:20px; width:280px; border-radius: 8px; background: #fff; box-shadow: var(--shadow);">
+                            <h3 style="color: var(--color-warning); margin-bottom: 10px;">Estándar / Pro</h3>
+                            <p style="font-size: 0.9em; color: var(--color-text-light); margin-bottom: 15px;">Incluye
+                                FIFO/FEFO, gestión por lotes, alertas y soporte prioritario.</p>
+                            <p style="font-size: 1.2em; font-weight: bold; margin-bottom: 15px;">$15.000 ARS / mes</p>
+                            <button id="btnSuscribirEstandar" class="btn btn-warning" style="width: 100%;">Suscribir
+                                Estándar</button>
                             <button onclick="enterProCode()" class="btn btn-secondary"
-                                style="margin-top:8px; font-size:0.85em;">
+                                style="margin-top:8px; font-size:0.85em; width: 100%;">
                                 🔑 Activar con Código
                             </button>
                         </div>
+                    </div>
+
+                    <!-- Sección de Soporte en Suscripción -->
+                    <div
+                        style="margin-top: 30px; padding: 25px; background-color: #f0f7ff; border-radius: 12px; border: 1px solid #d0e3ff; text-align: center; box-shadow: var(--shadow);">
+                        <h4 style="color: #007bff; margin-bottom: 10px; font-size: 1.3em;">🛟 ¿Problemas con tu
+                            suscripción?</h4>
+                        <p style="color: #444;">Contacta a soporte técnico directamente por WhatsApp para activar tu
+                            plan o resolver dudas:</p>
+                        <a href="https://wa.me/5492664024390" target="_blank" class="btn"
+                            style="margin-top: 15px; background-color: #25D366; color: white; padding: 12px 24px; font-size: 1.1em; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 10px;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA"
+                                style="width: 20px; height: 20px; filter: brightness(0) invert(1);">
+                            +54 9 266 402-4390
+                        </a>
                     </div>
                 </section>
             </div>
@@ -284,12 +318,14 @@
                                     <li><strong>📦 Inventario:</strong> Agregar y gestionar productos</li>
                                     <li><strong>💊 Nueva Venta:</strong> Realizar ventas a clientes</li>
                                     <li><strong>💳 Suscripción:</strong> Gestionar tu plan</li>
-                                    <li><strong>� Ayuda:</strong> Esta sección</li>
+                                    <li><strong> Ayuda:</strong> Esta sección</li>
                                 </ul>
                                 <p><strong>Sistema FIFO/FEFO:</strong></p>
                                 <ul>
-                                    <li><strong>FIFO:</strong> Vende primero lo que ingresó primero</li>
-                                    <li><strong>FEFO:</strong> Vende primero lo que vence primero</li>
+                                    <li><strong>FIFO:</strong> Vende primero lo que ingresó primero (First In, First
+                                        Out)</li>
+                                    <li><strong>FEFO:</strong> Vende primero lo que vence primero (First Expired, First
+                                        Out)</li>
                                     <li>Cambia el método en el header: "Rotación"</li>
                                 </ul>
                             </div>
@@ -306,7 +342,7 @@
                                             <li><strong>Código de Barras:</strong> Ej: "7501234567890" (opcional)</li>
                                             <li><strong>Precio:</strong> Ej: "5.00"</li>
                                             <li><strong>Stock:</strong> Ej: "100"</li>
-                                            <li><strong>Lote:</strong> Ej: "LOTE-2025-01" (opcional)</li>
+                                            <li><strong>Lote:</strong> Ej: "LOTE-2026-01" (opcional)</li>
                                             <li><strong>Vencimiento:</strong> Fecha (opcional)</li>
                                         </ul>
                                     </li>
@@ -335,10 +371,9 @@
                                 <p><strong>Usar en ventas:</strong></p>
                                 <ol>
                                     <li>Ve a "💊 Nueva Venta"</li>
-                                    <li>Apunta el scanner a la caja del producto</li>
-                                    <li>Presiona el gatillo → ¡BIP!</li>
-                                    <li>El producto se selecciona automáticamente</li>
-                                    <li>Click en "Agregar"</li>
+                                    <li>Espera que el cursor esté en el campo de código de barras</li>
+                                    <li>Escanea el producto → El producto se selecciona automáticamente</li>
+                                    <li>Ingresa cantidad y click en "Agregar"</li>
                                 </ol>
                             </div>
 
@@ -374,236 +409,158 @@
                                 <h3>👥 Sistema de Dispensa</h3>
                                 <p><strong>¿Qué es?</strong> Registro de a qué paciente se le entrega cada medicamento.
                                 </p>
-                                <p><strong>Importante para:</strong></p>
-                                <ul>
-                                    <li>✅ Medicamentos controlados</li>
-                                    <li>✅ Trazabilidad</li>
-                                    <li>✅ Cumplimiento de regulaciones</li>
-                                    <li>✅ Historial por paciente</li>
-                                </ul>
                                 <p><strong>Cómo usar:</strong></p>
                                 <ol>
-                                    <li>En "💊 Nueva Venta", baja hasta "Datos del Paciente"</li>
-                                    <li>Completa:
-                                        <ul>
-                                            <li><strong>Paciente/Cliente:</strong> Nombre completo</li>
-                                            <li><strong>Documento/RUT:</strong> Número de identificación</li>
-                                        </ul>
-                                    </li>
+                                    <li>En "💊 Nueva Venta", completa los campos de "Paciente/Cliente"</li>
                                     <li>Agrega productos y finaliza la venta</li>
-                                    <li>✅ Datos guardados en historial y ticket</li>
+                                    <li>✅ Los datos aparecerán en el ticket y en el historial</li>
                                 </ol>
-                                <p><em>Nota: Los campos son opcionales, pero recomendados para medicamentos
-                                        controlados.</em></p>
                             </div>
 
                             <!-- Excel -->
                             <div id="ayuda-excel" class="manual-section">
                                 <h3>📊 Importar/Exportar Excel</h3>
-                                <p><strong>Exportar inventario:</strong></p>
-                                <ol>
-                                    <li>Ve a "📦 Inventario"</li>
-                                    <li>Click en "💾 Exportar Excel"</li>
-                                    <li>Se descarga: Inventario_Farmacia_FECHA.xlsx</li>
-                                    <li>✅ Abre con Excel/LibreOffice</li>
-                                </ol>
-                                <p><strong>Importar productos:</strong></p>
-                                <ol>
-                                    <li>Prepara Excel con columnas: Nombre, Precio, Stock</li>
-                                    <li>Guarda como .xlsx</li>
-                                    <li>Click en "📂 Importar Excel"</li>
-                                    <li>Selecciona tu archivo</li>
-                                    <li>✅ Productos importados</li>
-                                </ol>
-                                <p><strong>Actualización masiva de precios:</strong></p>
-                                <ul>
-                                    <li><strong>Aumento:</strong> Click en "📈 Aumento %" → Ingresa porcentaje</li>
-                                    <li><strong>Reducción:</strong> Click en "📉 Reducción %" → Ingresa porcentaje</li>
-                                </ul>
+                                <p>Usa los botones de la pestaña Inventario para gestionar tus listas masivamente.</p>
                             </div>
 
                             <!-- Tickets -->
                             <div id="ayuda-tickets" class="manual-section">
                                 <h3>🖨️ Impresión de Tickets</h3>
-                                <p><strong>Imprimir ticket de venta:</strong></p>
-                                <ol>
-                                    <li>Al finalizar venta, click en "✅ Cobrar e Imprimir"</li>
-                                    <li>Se abre ventana de impresión</li>
-                                    <li>Selecciona impresora</li>
-                                    <li>Click en "Imprimir"</li>
-                                </ol>
-                                <p><strong>Reimprimir último ticket:</strong></p>
-                                <ul>
-                                    <li>Click en "🖨️ Imprimir Último Ticket" (toolbar)</li>
-                                </ul>
-                                <p><strong>El ticket incluye:</strong></p>
-                                <ul>
-                                    <li>Nombre de la farmacia</li>
-                                    <li>Fecha y hora</li>
-                                    <li>Datos del paciente (si se registraron)</li>
-                                    <li>Lista de productos</li>
-                                    <li>Total de la venta</li>
-                                </ul>
+                                <p>El sistema genera tickets optimizados para impresoras térmicas de 58mm o 80mm.</p>
                             </div>
 
                             <!-- FAQ -->
                             <div id="ayuda-faq" class="manual-section">
                                 <h3>❓ Preguntas Frecuentes</h3>
-
-                                <p><strong>¿Los datos se guardan automáticamente?</strong></p>
-                                <p>✅ Sí, todo se guarda automáticamente en el navegador (localStorage).</p>
-
-                                <p><strong>¿Puedo usar sin internet?</strong></p>
-                                <p>✅ Sí, funciona 100% offline una vez descargado.</p>
-
-                                <p><strong>¿Qué pasa si cierro el navegador?</strong></p>
-                                <p>✅ Nada, todos los datos se mantienen al volver a abrir.</p>
-
-                                <p><strong>¿Cuántos productos puedo cargar?</strong></p>
-                                <p>✅ Sin límite (depende de tu computadora).</p>
-
-                                <p><strong>¿Funciona en celular/tablet?</strong></p>
-                                <p>✅ Sí, es responsive. Pero se recomienda usar en computadora.</p>
-
-                                <p><strong>¿Qué scanner compro?</strong></p>
-                                <p>✅ Cualquier scanner USB/Bluetooth en modo teclado ($20-50 USD).</p>
-
-                                <p><strong>¿Cómo hago backup?</strong></p>
-                                <p>✅ Exporta a Excel regularmente o copia la carpeta completa.</p>
-
-                                <p><strong>El scanner no funciona, ¿qué hago?</strong></p>
-                                <ul>
-                                    <li>Verifica que esté en modo HID Keyboard</li>
-                                    <li>Prueba en Notepad: ¿se escribe el código?</li>
-                                    <li>Cambia de puerto USB o reconecta Bluetooth</li>
-                                </ul>
-
-                                <p><strong>No se imprime el ticket, ¿por qué?</strong></p>
-                                <ul>
-                                    <li>Permite ventanas emergentes en el navegador</li>
-                                    <li>Verifica que la impresora esté encendida</li>
-                                    <li>Prueba con "Imprimir a PDF"</li>
-                                </ul>
+                                <p><strong>¿Funciona sin internet?</strong></p>
+                                <p>✅ Sí, una vez cargada la página, todo funciona localmente.</p>
+                                <p><strong>¿Y si cambio de computadora?</strong></p>
+                                <p>✅ Debes exportar tu inventario a Excel e importarlo en la nueva máquina.</p>
                             </div>
 
                             <!-- Contacto -->
                             <div class="manual-section"
-                                style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-top: 30px;">
-                                <h3>📞 ¿Necesitas más ayuda?</h3>
-                                <p><strong>Manual completo:</strong> Revisa el archivo <code>MANUAL_DE_USUARIO.md</code>
-                                    incluido en la carpeta del sistema.</p>
-                                <p><strong>Soporte técnico:</strong> Contáctanos por Mercado Libre</p>
-                                <p><strong>Horario:</strong> Lunes a Viernes 9:00 - 18:00 hs</p>
-                                <p><strong>Respuesta:</strong> Menos de 24 horas</p>
+                                style="background: #e3f2fd; padding: 25px; border-radius: 12px; margin-top: 30px; border: 1px solid #b3d7ff;">
+                                <h3>📞 ¿Necesitas Soporte Técnico?</h3>
+                                <p><strong>WhatsApp:</strong> <a href="https://wa.me/5492664024390" target="_blank"
+                                        style="color: #0b7dda; font-weight: bold; text-decoration: none;">+54 9 266
+                                        402-4390</a></p>
+                                <p><strong>Horario:</strong> Lunes a Viernes 09:00 - 18:00 hs</p>
+                                <p><strong>Respuesta:</strong> Inmediata o en menos de 24 horas</p>
                             </div>
 
                         </div>
                     </div>
                 </section>
             </div>
+        </div>
 
-            <!-- Modal Premium (Smart-Link) -->
-            <div class="modal fade" id="modalPremium" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">👑 Suscripción Premium</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close">✕</button>
-                        </div>
-                        <div class="modal-body text-center p-4">
-                            <h3>Confirmar suscripción</h3>
-                            <p class="mb-2">Serás redirigido a Mercado Pago para completar el pago.</p>
-                            <div class="premium-price">$--</div>
-                            <div class="d-grid gap-2" style="max-width:400px; margin:0 auto;">
-                                <a class="btn btn-primary mp-pay-link" href="#" target="_blank">
-                                    💳 Pagar con Mercado Pago
-                                </a>
-                                <button class="btn btn-outline-secondary mp-copy-btn" type="button">
-                                    📋 Copiar link
-                                </button>
-                            </div>
-                            <p class="text-muted small mt-3">Una vez completado el pago, serás redirigido y tu acceso
-                                quedará activo en este dispositivo.</p>
+        <!-- Modales -->
 
-                            <!-- Sección de Código de Activación -->
-                            <div class="mt-4 pt-3" style="border-top: 2px solid #e0e0e0;">
-                                <p class="text-muted small mb-2">¿Ya tienes una licencia?</p>
-                                <button class="btn btn-outline-warning btn-sm" onclick="enterProCode()" type="button">
-                                    🔑 Ingresar Código de Activación
-                                </button>
-                            </div>
-                        </div>
+        <!-- Modal Premium (Smart-Link) -->
+        <div class="modal" id="modalPremium">
+            <div class="modal-content" style="max-width: 600px;">
+                <h2 style="text-align: center;">👑 Suscripción Premium</h2>
+                <div style="text-align: center; padding: 20px;">
+                    <p>Serás redirigido a Mercado Pago para completar el pago de forma segura.</p>
+                    <div class="premium-price"
+                        style="font-size: 2em; font-weight: bold; color: var(--color-primary); margin: 20px 0;">$--
                     </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                        <a class="btn btn-success mp-pay-link" href="#" target="_blank"
+                            style="padding: 15px; font-size: 1.1em; background-color: #008f5b;">
+                            💳 Pagar con Mercado Pago
+                        </a>
+                        <button class="btn btn-secondary mp-copy-btn" type="button">
+                            📋 Copiar Link de Pago
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                        <p style="font-size: 0.9em; color: #666;">¿Ya realizaste el pago y tienes un código?</p>
+                        <button class="btn btn-warning" onclick="enterProCode()"
+                            style="margin-top: 10px; font-size: 0.9em;">
+                            🔑 Ingresar Código de Activación
+                        </button>
+                    </div>
+
+                    <button class="btn btn-secondary"
+                        onclick="document.getElementById('modalPremium').classList.remove('active')"
+                        style="margin-top: 20px;">
+                        Cerrar
+                    </button>
                 </div>
             </div>
-            <!-- Modal Soporte -->
-            <div id="modalSupport" class="modal">
-                <div class="modal-content">
-                    <h2><i class="fas fa-headset"></i> Soporte y Contacto</h2>
-                    <p>Contactanos por WhatsApp o envíanos un correo.</p>
+        </div>
 
-                    <div style="display:flex; gap:8px; margin-bottom:10px;">
-                        <a id="supportWhatsapp" href="https://wa.me/5492664024390" target="_blank"
-                            class="btn btn-success">💬 Chat por WhatsApp</a>
-                        <button id="supportCopyLink" class="btn btn-secondary">🔗 Copiar link de soporte</button>
+        <!-- Modal Soporte -->
+        <div id="modalSupport" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <h2 style="text-align: center; color: var(--color-secondary);">🛟 Centro de Soporte</h2>
+                <div style="padding: 20px; text-align: center;">
+                    <p>¿En qué podemos ayudarte hoy?</p>
+
+                    <div style="display: grid; gap: 15px; margin-top: 25px;">
+                        <a href="https://wa.me/5492664024390" target="_blank" class="btn border-radius: 6px;"
+                            style="background: #25D366; color: white; padding: 15px; text-decoration: none; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                            💬 WhatsApp Directo
+                        </a>
+                        <button id="supportCopyLink" class="btn btn-info">🔗 Copiar Link de Soporte</button>
                     </div>
 
-                    <div style="text-align:left;">
-                        <p style="font-size:0.9rem;"><strong>O envíanos un mensaje (Formulario):</strong></p>
+                    <div
+                        style="margin-top: 30px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">O envíanos un correo:</p>
                         <form id="formSupport" action="https://formspree.io/f/mvgzqkpv" method="POST" target="_blank">
-                            <div style="margin-bottom:6px;"><input type="email" name="email" placeholder="Tu email"
-                                    required style="width:100%; padding:6px;"></div>
-                            <div style="margin-bottom:6px;"><textarea name="message"
-                                    placeholder="Escribe tu consulta aquí..." rows="4" required
-                                    style="width:100%; padding:6px;"></textarea></div>
-                            <div style="margin-top:8px; display:flex; gap:8px;">
-                                <button type="submit" class="btn btn-primary">Enviar mensaje</button>
-                                <button type="button" id="supportClose" class="btn btn-secondary">Cerrar</button>
-                            </div>
+                            <input type="email" name="email" placeholder="Tu Email" required
+                                style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                            <textarea name="message" placeholder="¿Cómo podemos ayudarte?" rows="3" required
+                                style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; resize: none;"></textarea>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Enviar Consulta</button>
                         </form>
                     </div>
 
-                    <p class="small text-muted" style="margin-top:12px;">Soporte: WhatsApp y formulario conectados
-                        (Formspree).</p>
+                    <button class="btn btn-secondary" id="supportClose"
+                        style="margin-top: 20px; width: 100%;">Cerrar</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modales -->
-    <!-- Modal de confirmación -->
-    <div id="modalConfirmacion" class="modal">
-        <div class="modal-content">
-            <h2 id="tituloConfirmacion">Confirmación</h2>
-            <p id="textoConfirmacion"></p>
-            <div class="modal-buttons">
-                <button id="btnConfirmarSi" class="btn btn-success">Sí, confirmar</button>
-                <button id="btnConfirmarNo" class="btn btn-secondary">No, cancelar</button>
+        <!-- Modal de confirmación -->
+        <div id="modalConfirmacion" class="modal">
+            <div class="modal-content">
+                <h2 id="tituloConfirmacion">Confirmación</h2>
+                <p id="textoConfirmacion"></p>
+                <div class="modal-buttons">
+                    <button id="btnConfirmarSi" class="btn btn-success">Sí, confirmar</button>
+                    <button id="btnConfirmarNo" class="btn btn-secondary">No, cancelar</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal de información -->
-    <div id="modalInfo" class="modal">
-        <div class="modal-content">
-            <h2 id="tituloInfo">Información</h2>
-            <p id="textoInfo"></p>
-            <div class="modal-buttons">
-                <button id="btnCerrarInfo" class="btn btn-success">Aceptar</button>
+        <!-- Modal de información -->
+        <div id="modalInfo" class="modal">
+            <div class="modal-content">
+                <h2 id="tituloInfo">Información</h2>
+                <p id="textoInfo"></p>
+                <div class="modal-buttons">
+                    <button id="btnCerrarInfo" class="btn btn-success">Aceptar</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal de error -->
-    <div id="modalError" class="modal">
-        <div class="modal-content error-content">
-            <h2>❌ Error</h2>
-            <p id="textoError"></p>
-            <div class="modal-buttons">
-                <button id="btnCerrarError" class="btn btn-secondary">Cerrar</button>
+        <!-- Modal de error -->
+        <div id="modalError" class="modal">
+            <div class="modal-content error-content">
+                <h2>❌ Error</h2>
+                <p id="textoError"></p>
+                <div class="modal-buttons">
+                    <button id="btnCerrarError" class="btn btn-secondary">Cerrar</button>
+                </div>
             </div>
         </div>
+
     </div>
 
     <!-- Scripts -->

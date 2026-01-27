@@ -927,12 +927,11 @@ class FarmaciaApp {
             copyBtn.onclick = () => navigator.clipboard.writeText(plan.url).then(() => alert('Link copiado al portapapeles'));
         }
 
-        // Mostrar modal usando clase 'show' si Bootstrap/Modal no disponible
+        // Mostrar modal
         if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
             new bootstrap.Modal(modal).show();
         } else {
-            // fallback: abrir ventana
-            window.open(plan.url, '_blank');
+            modal.classList.add('active');
         }
     }
 
@@ -942,12 +941,12 @@ class FarmaciaApp {
         const accessCode = urlParams.get('access');
 
         // Verificar códigos de activación desde URL
-        if (accessCode === 'farmacia_basic_2025') {
+        if (accessCode === 'farmacia_basic_2026') {
             localStorage.setItem('farmacia_premium_active', 'basic');
             localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
             window.history.replaceState({}, document.title, window.location.pathname);
             this.mostrarInfo('¡Pago Exitoso! Plan <strong>Básico</strong> activado. 🎉');
-        } else if (accessCode === 'farmacia_pro_2025') {
+        } else if (accessCode === 'farmacia_pro_2026') {
             localStorage.setItem('farmacia_premium_active', 'pro');
             localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1007,12 +1006,12 @@ window.activarConCodigo = function (code) {
     }
 
     // Validar y activar según el código
-    if (code === 'farmacia_basic_2025') {
+    if (code === 'farmacia_basic_2026') {
         localStorage.setItem('farmacia_premium_active', 'basic');
         localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
         alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nLa página se recargará para aplicar los cambios.");
         location.reload();
-    } else if (code === 'farmacia_pro_2025') {
+    } else if (code === 'farmacia_pro_2026') {
         localStorage.setItem('farmacia_premium_active', 'pro');
         localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
         alert("¡Felicidades! Plan PRO Activado. 🚀\n\nLa página se recargará para aplicar los cambios.");
@@ -1032,12 +1031,12 @@ window.enterProCode = function () {
     const codeTrimmed = code.trim();
 
     // Validar códigos de activación
-    if (codeTrimmed === 'farmacia_basic_2025') {
+    if (codeTrimmed === 'farmacia_basic_2026') {
         localStorage.setItem('farmacia_premium_active', 'basic');
         localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
         alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nRecarga la página para aplicar los cambios.");
         location.reload();
-    } else if (codeTrimmed === 'farmacia_pro_2025') {
+    } else if (codeTrimmed === 'farmacia_pro_2026') {
         localStorage.setItem('farmacia_premium_active', 'pro');
         localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
         alert("¡Felicidades! Plan PRO Activado. 🚀\n\nRecarga la página para aplicar los cambios.");
