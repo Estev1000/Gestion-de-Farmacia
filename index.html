@@ -52,6 +52,7 @@
                 <button class="tab-button active" data-tab="tab-inventario">📦 Inventario</button>
                 <button class="tab-button" data-tab="tab-ventas">💊 Nueva Venta</button>
                 <button class="tab-button" data-tab="tab-suscripcion">💳 Suscripción</button>
+                <button class="tab-button" data-tab="tab-ayuda">📖 Ayuda</button>
             </div>
 
             <!-- PESTAÑA: INVENTARIO -->
@@ -64,6 +65,11 @@
                         <div class="form-group">
                             <label for="prodNombre">Nombre del Producto:</label>
                             <input type="text" id="prodNombre" placeholder="Ej: Paracetamol 500mg" class="input-large">
+                        </div>
+                        <div class="form-group">
+                            <label for="prodCodigoBarras">Código de Barras (opcional):</label>
+                            <input type="text" id="prodCodigoBarras" placeholder="Ej: 7501234567890"
+                                class="input-large">
                         </div>
                         <div class="form-group">
                             <label for="prodPrecio">Precio:</label>
@@ -126,7 +132,13 @@
 
                     <div class="venta-controls">
                         <div class="form-group search-group">
-                            <label for="selectProductoVenta">Buscar Producto:</label>
+                            <label for="inputCodigoBarras">🔍 Código de Barras (Scanner):</label>
+                            <input type="text" id="inputCodigoBarras"
+                                placeholder="Escanee o ingrese código de barras..." class="input-large"
+                                autocomplete="off">
+                        </div>
+                        <div class="form-group search-group">
+                            <label for="selectProductoVenta">O Buscar Producto:</label>
                             <select id="selectProductoVenta" class="input-large">
                                 <option value="">Seleccione un producto...</option>
                             </select>
@@ -139,6 +151,21 @@
                             <button id="btnAgregarCarrito" class="btn btn-success">
                                 ⬇️ Agregar
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Campo de Paciente/Cliente -->
+                    <div class="venta-controls"
+                        style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
+                        <div class="form-group search-group">
+                            <label for="inputPaciente">👤 Paciente/Cliente:</label>
+                            <input type="text" id="inputPaciente" placeholder="Nombre del paciente (opcional)"
+                                class="input-large" autocomplete="off">
+                        </div>
+                        <div class="form-group search-group">
+                            <label for="inputDocumento">📋 Documento/RUT (opcional):</label>
+                            <input type="text" id="inputDocumento" placeholder="Ej: 12.345.678-9" class="input-large"
+                                autocomplete="off">
                         </div>
                     </div>
                 </section>
@@ -219,6 +246,257 @@
                                 style="margin-top:8px; font-size:0.85em;">
                                 🔑 Activar con Código
                             </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PESTAÑA: AYUDA -->
+            <div id="tab-ayuda" class="tab-content">
+                <section class="section">
+                    <h2>📖 Manual de Usuario</h2>
+                    <p class="section-subtitle">Guía completa para usar el sistema</p>
+
+                    <div class="manual-container">
+                        <!-- Índice -->
+                        <div class="manual-index">
+                            <h3>📑 Índice Rápido</h3>
+                            <ul>
+                                <li><a href="#ayuda-inicio">🚀 Primeros Pasos</a></li>
+                                <li><a href="#ayuda-inventario">📦 Gestión de Inventario</a></li>
+                                <li><a href="#ayuda-barras">🔍 Código de Barras</a></li>
+                                <li><a href="#ayuda-ventas">💊 Realizar Ventas</a></li>
+                                <li><a href="#ayuda-dispensa">👥 Sistema de Dispensa</a></li>
+                                <li><a href="#ayuda-excel">📊 Excel</a></li>
+                                <li><a href="#ayuda-tickets">🖨️ Tickets</a></li>
+                                <li><a href="#ayuda-faq">❓ Preguntas Frecuentes</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Contenido del manual -->
+                        <div class="manual-content">
+
+                            <!-- Primeros Pasos -->
+                            <div id="ayuda-inicio" class="manual-section">
+                                <h3>🚀 Primeros Pasos</h3>
+                                <p><strong>Interfaz Principal:</strong></p>
+                                <ul>
+                                    <li><strong>📦 Inventario:</strong> Agregar y gestionar productos</li>
+                                    <li><strong>💊 Nueva Venta:</strong> Realizar ventas a clientes</li>
+                                    <li><strong>💳 Suscripción:</strong> Gestionar tu plan</li>
+                                    <li><strong>� Ayuda:</strong> Esta sección</li>
+                                </ul>
+                                <p><strong>Sistema FIFO/FEFO:</strong></p>
+                                <ul>
+                                    <li><strong>FIFO:</strong> Vende primero lo que ingresó primero</li>
+                                    <li><strong>FEFO:</strong> Vende primero lo que vence primero</li>
+                                    <li>Cambia el método en el header: "Rotación"</li>
+                                </ul>
+                            </div>
+
+                            <!-- Inventario -->
+                            <div id="ayuda-inventario" class="manual-section">
+                                <h3>📦 Gestión de Inventario</h3>
+                                <p><strong>Agregar un producto:</strong></p>
+                                <ol>
+                                    <li>Ve a la pestaña "📦 Inventario"</li>
+                                    <li>Completa los campos:
+                                        <ul>
+                                            <li><strong>Nombre:</strong> Ej: "Paracetamol 500mg"</li>
+                                            <li><strong>Código de Barras:</strong> Ej: "7501234567890" (opcional)</li>
+                                            <li><strong>Precio:</strong> Ej: "5.00"</li>
+                                            <li><strong>Stock:</strong> Ej: "100"</li>
+                                            <li><strong>Lote:</strong> Ej: "LOTE-2025-01" (opcional)</li>
+                                            <li><strong>Vencimiento:</strong> Fecha (opcional)</li>
+                                        </ul>
+                                    </li>
+                                    <li>Click en "➕ Agregar Producto"</li>
+                                    <li>✅ Producto agregado</li>
+                                </ol>
+                                <p><strong>Eliminar producto:</strong> Click en el botón 🗑️ en la tabla</p>
+                            </div>
+
+                            <!-- Código de Barras -->
+                            <div id="ayuda-barras" class="manual-section">
+                                <h3>🔍 Código de Barras</h3>
+                                <p><strong>¿Qué scanner necesito?</strong></p>
+                                <ul>
+                                    <li>✅ Scanner USB con cable ($20-50 USD)</li>
+                                    <li>✅ Scanner Bluetooth inalámbrico ($50-100 USD)</li>
+                                    <li>✅ Cualquier marca (Honeywell, Zebra, genéricos)</li>
+                                    <li>✅ Modo requerido: HID Keyboard (modo teclado)</li>
+                                </ul>
+                                <p><strong>Conectar el scanner:</strong></p>
+                                <ul>
+                                    <li><strong>USB:</strong> Conecta el cable → Espera 5 segundos → ✅ Listo</li>
+                                    <li><strong>Bluetooth:</strong> Enciende → Conecta desde configuración → ✅ Listo
+                                    </li>
+                                </ul>
+                                <p><strong>Usar en ventas:</strong></p>
+                                <ol>
+                                    <li>Ve a "💊 Nueva Venta"</li>
+                                    <li>Apunta el scanner a la caja del producto</li>
+                                    <li>Presiona el gatillo → ¡BIP!</li>
+                                    <li>El producto se selecciona automáticamente</li>
+                                    <li>Click en "Agregar"</li>
+                                </ol>
+                            </div>
+
+                            <!-- Ventas -->
+                            <div id="ayuda-ventas" class="manual-section">
+                                <h3>💊 Realizar Ventas</h3>
+                                <p><strong>Venta manual (sin scanner):</strong></p>
+                                <ol>
+                                    <li>Ve a "💊 Nueva Venta"</li>
+                                    <li>Selecciona producto del menú desplegable</li>
+                                    <li>Ingresa cantidad</li>
+                                    <li>Click en "⬇️ Agregar"</li>
+                                    <li>Repite para más productos</li>
+                                    <li>Click en "✅ Cobrar e Imprimir"</li>
+                                </ol>
+                                <p><strong>Venta con scanner (rápida):</strong></p>
+                                <ol>
+                                    <li>Ve a "💊 Nueva Venta"</li>
+                                    <li>Escanea código de barras → Producto seleccionado</li>
+                                    <li>Click en "⬇️ Agregar"</li>
+                                    <li>Repite para más productos</li>
+                                    <li>Click en "✅ Cobrar e Imprimir"</li>
+                                </ol>
+                                <p><strong>Modificar carrito:</strong></p>
+                                <ul>
+                                    <li><strong>Eliminar producto:</strong> Click en ✕</li>
+                                    <li><strong>Cancelar venta:</strong> Click en "❌ Cancelar"</li>
+                                </ul>
+                            </div>
+
+                            <!-- Dispensa -->
+                            <div id="ayuda-dispensa" class="manual-section">
+                                <h3>👥 Sistema de Dispensa</h3>
+                                <p><strong>¿Qué es?</strong> Registro de a qué paciente se le entrega cada medicamento.
+                                </p>
+                                <p><strong>Importante para:</strong></p>
+                                <ul>
+                                    <li>✅ Medicamentos controlados</li>
+                                    <li>✅ Trazabilidad</li>
+                                    <li>✅ Cumplimiento de regulaciones</li>
+                                    <li>✅ Historial por paciente</li>
+                                </ul>
+                                <p><strong>Cómo usar:</strong></p>
+                                <ol>
+                                    <li>En "💊 Nueva Venta", baja hasta "Datos del Paciente"</li>
+                                    <li>Completa:
+                                        <ul>
+                                            <li><strong>Paciente/Cliente:</strong> Nombre completo</li>
+                                            <li><strong>Documento/RUT:</strong> Número de identificación</li>
+                                        </ul>
+                                    </li>
+                                    <li>Agrega productos y finaliza la venta</li>
+                                    <li>✅ Datos guardados en historial y ticket</li>
+                                </ol>
+                                <p><em>Nota: Los campos son opcionales, pero recomendados para medicamentos
+                                        controlados.</em></p>
+                            </div>
+
+                            <!-- Excel -->
+                            <div id="ayuda-excel" class="manual-section">
+                                <h3>📊 Importar/Exportar Excel</h3>
+                                <p><strong>Exportar inventario:</strong></p>
+                                <ol>
+                                    <li>Ve a "📦 Inventario"</li>
+                                    <li>Click en "💾 Exportar Excel"</li>
+                                    <li>Se descarga: Inventario_Farmacia_FECHA.xlsx</li>
+                                    <li>✅ Abre con Excel/LibreOffice</li>
+                                </ol>
+                                <p><strong>Importar productos:</strong></p>
+                                <ol>
+                                    <li>Prepara Excel con columnas: Nombre, Precio, Stock</li>
+                                    <li>Guarda como .xlsx</li>
+                                    <li>Click en "📂 Importar Excel"</li>
+                                    <li>Selecciona tu archivo</li>
+                                    <li>✅ Productos importados</li>
+                                </ol>
+                                <p><strong>Actualización masiva de precios:</strong></p>
+                                <ul>
+                                    <li><strong>Aumento:</strong> Click en "📈 Aumento %" → Ingresa porcentaje</li>
+                                    <li><strong>Reducción:</strong> Click en "📉 Reducción %" → Ingresa porcentaje</li>
+                                </ul>
+                            </div>
+
+                            <!-- Tickets -->
+                            <div id="ayuda-tickets" class="manual-section">
+                                <h3>🖨️ Impresión de Tickets</h3>
+                                <p><strong>Imprimir ticket de venta:</strong></p>
+                                <ol>
+                                    <li>Al finalizar venta, click en "✅ Cobrar e Imprimir"</li>
+                                    <li>Se abre ventana de impresión</li>
+                                    <li>Selecciona impresora</li>
+                                    <li>Click en "Imprimir"</li>
+                                </ol>
+                                <p><strong>Reimprimir último ticket:</strong></p>
+                                <ul>
+                                    <li>Click en "🖨️ Imprimir Último Ticket" (toolbar)</li>
+                                </ul>
+                                <p><strong>El ticket incluye:</strong></p>
+                                <ul>
+                                    <li>Nombre de la farmacia</li>
+                                    <li>Fecha y hora</li>
+                                    <li>Datos del paciente (si se registraron)</li>
+                                    <li>Lista de productos</li>
+                                    <li>Total de la venta</li>
+                                </ul>
+                            </div>
+
+                            <!-- FAQ -->
+                            <div id="ayuda-faq" class="manual-section">
+                                <h3>❓ Preguntas Frecuentes</h3>
+
+                                <p><strong>¿Los datos se guardan automáticamente?</strong></p>
+                                <p>✅ Sí, todo se guarda automáticamente en el navegador (localStorage).</p>
+
+                                <p><strong>¿Puedo usar sin internet?</strong></p>
+                                <p>✅ Sí, funciona 100% offline una vez descargado.</p>
+
+                                <p><strong>¿Qué pasa si cierro el navegador?</strong></p>
+                                <p>✅ Nada, todos los datos se mantienen al volver a abrir.</p>
+
+                                <p><strong>¿Cuántos productos puedo cargar?</strong></p>
+                                <p>✅ Sin límite (depende de tu computadora).</p>
+
+                                <p><strong>¿Funciona en celular/tablet?</strong></p>
+                                <p>✅ Sí, es responsive. Pero se recomienda usar en computadora.</p>
+
+                                <p><strong>¿Qué scanner compro?</strong></p>
+                                <p>✅ Cualquier scanner USB/Bluetooth en modo teclado ($20-50 USD).</p>
+
+                                <p><strong>¿Cómo hago backup?</strong></p>
+                                <p>✅ Exporta a Excel regularmente o copia la carpeta completa.</p>
+
+                                <p><strong>El scanner no funciona, ¿qué hago?</strong></p>
+                                <ul>
+                                    <li>Verifica que esté en modo HID Keyboard</li>
+                                    <li>Prueba en Notepad: ¿se escribe el código?</li>
+                                    <li>Cambia de puerto USB o reconecta Bluetooth</li>
+                                </ul>
+
+                                <p><strong>No se imprime el ticket, ¿por qué?</strong></p>
+                                <ul>
+                                    <li>Permite ventanas emergentes en el navegador</li>
+                                    <li>Verifica que la impresora esté encendida</li>
+                                    <li>Prueba con "Imprimir a PDF"</li>
+                                </ul>
+                            </div>
+
+                            <!-- Contacto -->
+                            <div class="manual-section"
+                                style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-top: 30px;">
+                                <h3>📞 ¿Necesitas más ayuda?</h3>
+                                <p><strong>Manual completo:</strong> Revisa el archivo <code>MANUAL_DE_USUARIO.md</code>
+                                    incluido en la carpeta del sistema.</p>
+                                <p><strong>Soporte técnico:</strong> Contáctanos por Mercado Libre</p>
+                                <p><strong>Horario:</strong> Lunes a Viernes 9:00 - 18:00 hs</p>
+                                <p><strong>Respuesta:</strong> Menos de 24 horas</p>
+                            </div>
+
                         </div>
                     </div>
                 </section>

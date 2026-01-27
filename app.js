@@ -8,6 +8,7 @@ class FarmaciaApp {
         this.productos = [];
         this.carrito = [];
         this.ventasTotales = 0.0;
+        this.historialVentas = []; // Nuevo: historial de ventas con dispensa
 
         // Cargar datos del localStorage
         this.cargarDatos();
@@ -30,6 +31,7 @@ class FarmaciaApp {
                 const datos = JSON.parse(datosGuardados);
                 this.productos = datos.productos || [];
                 this.ventasTotales = datos.ventasTotales || 0.0;
+                this.historialVentas = datos.historialVentas || [];
 
                 // Migrar productos antiguos (con 'stock' simple) a nueva estructura con 'lotes'
                 this.productos = this.productos.map(p => {
@@ -69,7 +71,8 @@ class FarmaciaApp {
         try {
             const datos = {
                 productos: this.productos,
-                ventasTotales: this.ventasTotales
+                ventasTotales: this.ventasTotales,
+                historialVentas: this.historialVentas
             };
             localStorage.setItem('farmaciaData', JSON.stringify(datos));
         } catch (error) {
@@ -93,6 +96,7 @@ class FarmaciaApp {
         this.elementos = {
             // Inventario
             prodNombre: document.getElementById('prodNombre'),
+            prodCodigoBarras: document.getElementById('prodCodigoBarras'),
             prodPrecio: document.getElementById('prodPrecio'),
             prodStock: document.getElementById('prodStock'),
             prodLote: document.getElementById('prodLote'),
@@ -109,8 +113,11 @@ class FarmaciaApp {
             inputExcel: document.getElementById('inputExcel'),
 
             // Ventas
+            inputCodigoBarras: document.getElementById('inputCodigoBarras'),
             selectProductoVenta: document.getElementById('selectProductoVenta'),
             cantidadVenta: document.getElementById('cantidadVenta'),
+            inputPaciente: document.getElementById('inputPaciente'),
+            inputDocumento: document.getElementById('inputDocumento'),
             btnAgregarCarrito: document.getElementById('btnAgregarCarrito'),
 
             // Carrito
@@ -159,7 +166,13 @@ class FarmaciaApp {
         if (this.elementos.btnAumentoMasivo) this.elementos.btnAumentoMasivo.addEventListener('click', () => this.aumentoMasivo());
         if (this.elementos.btnReduccionMasiva) this.elementos.btnReduccionMasiva.addEventListener('click', () => this.reduccionMasiva());
 
-        // Ventas
+        // Ventas - Código de barras (scanner)
+        this.elementos.inputCodigoBarras.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.buscarPorCodigoBarras();
+            }
+        });
         this.elementos.btnAgregarCarrito.addEventListener('click', () => this.agregarAlCarrito());
         this.elementos.btnFinalizarCompra.addEventListener('click', () => this.finalizarCompra());
         this.elementos.btnCancelarCompra.addEventListener('click', () => this.cancelarCompra());
@@ -259,6 +272,7 @@ class FarmaciaApp {
 
     agregarProducto() {
         const nombre = this.elementos.prodNombre.value.trim();
+        const codigoBarras = this.elementos.prodCodigoBarras.value.trim();
         const precioStr = this.elementos.prodPrecio.value.trim().replace(',', '.');
         const stockStr = this.elementos.prodStock.value.trim();
         const loteNumero = this.elementos.prodLote ? this.elementos.prodLote.value.trim() : null;
@@ -275,6 +289,7 @@ class FarmaciaApp {
         const nuevoProducto = {
             id: Date.now(),
             nombre,
+            codigoBarras: codigoBarras || null,
             precio,
             lotes: []
         };
@@ -288,6 +303,7 @@ class FarmaciaApp {
 
         // Limpiar form
         this.elementos.prodNombre.value = '';
+        this.elementos.prodCodigoBarras.value = '';
         this.elementos.prodPrecio.value = '';
         this.elementos.prodStock.value = '';
         if (this.elementos.prodLote) this.elementos.prodLote.value = '';
@@ -524,6 +540,26 @@ class FarmaciaApp {
     // VENTAS
     // ============================================
 
+    buscarPorCodigoBarras() {
+        const codigo = this.elementos.inputCodigoBarras.value.trim();
+        if (!codigo) return;
+
+        const producto = this.productos.find(p => p.codigoBarras === codigo);
+
+        if (producto) {
+            // Seleccionar el producto en el select
+            this.elementos.selectProductoVenta.value = producto.id;
+            // Limpiar el campo de código de barras
+            this.elementos.inputCodigoBarras.value = '';
+            // Enfocar en cantidad
+            this.elementos.cantidadVenta.focus();
+            this.elementos.cantidadVenta.select();
+        } else {
+            this.mostrarError(`No se encontró producto con código: ${codigo}`);
+            this.elementos.inputCodigoBarras.value = '';
+        }
+    }
+
     actualizarSelectProductos() {
         const select = this.elementos.selectProductoVenta;
         const valorActual = select.value;
@@ -533,7 +569,8 @@ class FarmaciaApp {
         this.productos.forEach(prod => {
             const option = document.createElement('option');
             option.value = prod.id;
-            option.textContent = `${prod.nombre} - $${prod.precio.toFixed(2)} (Stock: ${this.getStock(prod)})`;
+            const codigoInfo = prod.codigoBarras ? ` [${prod.codigoBarras}]` : '';
+            option.textContent = `${prod.nombre}${codigoInfo} - $${prod.precio.toFixed(2)} (Stock: ${this.getStock(prod)})`;
             select.appendChild(option);
         });
 
@@ -628,6 +665,10 @@ class FarmaciaApp {
 
         this.mostrarConfirmacion('¿Confirmar venta e imprimir ticket?', () => {
             try {
+                // Obtener datos del paciente
+                const paciente = this.elementos.inputPaciente.value.trim();
+                const documento = this.elementos.inputDocumento.value.trim();
+
                 // Calcular total
                 const totalVenta = this.carrito.reduce((sum, item) => sum + item.subtotal, 0);
 
@@ -645,11 +686,30 @@ class FarmaciaApp {
                 // Actualizar caja
                 this.ventasTotales += totalVenta;
 
+                // Guardar en historial de ventas (DISPENSA)
+                const registroVenta = {
+                    id: Date.now(),
+                    fecha: new Date().toISOString(),
+                    paciente: paciente || 'Sin especificar',
+                    documento: documento || 'Sin especificar',
+                    items: this.carrito.map(item => ({
+                        producto: item.producto.nombre,
+                        cantidad: item.cantidad,
+                        precio: item.precioUnitario,
+                        subtotal: item.subtotal
+                    })),
+                    total: totalVenta,
+                    detalleConsumo: detalleConsumoGlobal
+                };
+                this.historialVentas.push(registroVenta);
+
                 // Guardar última venta para reimpresión
                 const ultimaVenta = {
                     items: [...this.carrito],
                     total: totalVenta,
-                    fecha: new Date().toISOString()
+                    fecha: new Date().toISOString(),
+                    paciente: paciente,
+                    documento: documento
                 };
                 localStorage.setItem('ultimaVenta', JSON.stringify(ultimaVenta));
 
@@ -659,7 +719,7 @@ class FarmaciaApp {
                 // Intentar imprimir ticket (no debe detener el flujo si falla)
                 try {
                     const carritoParaTicket = [...this.carrito];
-                    this.imprimirTicket(carritoParaTicket, totalVenta);
+                    this.imprimirTicket(carritoParaTicket, totalVenta, null, paciente, documento);
                 } catch (printError) {
                     console.error('Error al imprimir:', printError);
                     this.mostrarError('Venta registrada, pero no se pudo imprimir el ticket (¿Bloqueo de popups?)');
@@ -669,12 +729,16 @@ class FarmaciaApp {
                 this.carrito = [];
                 this.elementos.cantidadVenta.value = 1;
                 this.elementos.selectProductoVenta.value = "";
+                this.elementos.inputPaciente.value = "";
+                this.elementos.inputDocumento.value = "";
+                this.elementos.inputCodigoBarras.value = "";
                 this.actualizarUI();
 
                 // Solo mostrar éxito si no hay otro modal (como el de error de impresión)
                 if (!document.querySelector('.modal.active')) {
                     // Mostrar resumen ligero con consumo por lotes
                     let resumen = `Venta registrada. Total: $${totalVenta.toFixed(2)}`;
+                    if (paciente) resumen += `<br>Paciente: ${paciente}`;
                     resumen += '<br><br><strong>Consumo por lotes (FIFO):</strong><br>';
                     detalleConsumoGlobal.forEach(d => {
                         if (!d.detalle || d.detalle.length === 0) return;
@@ -705,14 +769,14 @@ class FarmaciaApp {
             }
 
             const ultimaVenta = JSON.parse(ultimaVentaStr);
-            this.imprimirTicket(ultimaVenta.items, ultimaVenta.total, new Date(ultimaVenta.fecha));
+            this.imprimirTicket(ultimaVenta.items, ultimaVenta.total, new Date(ultimaVenta.fecha), ultimaVenta.paciente, ultimaVenta.documento);
         } catch (error) {
             console.error('Error al reimprimir:', error);
             this.mostrarError('No se pudo recuperar la última venta.');
         }
     }
 
-    imprimirTicket(items, total, fechaPersonalizada = null) {
+    imprimirTicket(items, total, fechaPersonalizada = null, paciente = null, documento = null) {
         const ventanaImpresion = window.open('', '_blank');
 
         if (!ventanaImpresion) {
@@ -737,6 +801,7 @@ class FarmaciaApp {
                     .item { display: flex; justify-content: space-between; font-size: 12px; margin: 3px 0; }
                     .total { font-weight: bold; text-align: right; margin-top: 10px; font-size: 14px; }
                     .footer { font-size: 10px; margin-top: 15px; }
+                    .dispensa { font-size: 11px; text-align: left; margin: 10px 0; }
                 </style>
             </head>
             <body>
@@ -748,6 +813,14 @@ class FarmaciaApp {
                     </div>
                     <div class="separador"></div>
         `;
+
+        // Agregar información de dispensa si existe
+        if (paciente || documento) {
+            html += '<div class="dispensa">';
+            if (paciente) html += `<strong>Paciente:</strong> ${paciente}<br>`;
+            if (documento) html += `<strong>Doc/RUT:</strong> ${documento}<br>`;
+            html += '</div><div class="separador"></div>';
+        }
 
         items.forEach(item => {
             html += `
