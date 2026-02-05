@@ -17,6 +17,7 @@ class FarmaciaApp {
         this.rotacionMethod = localStorage.getItem('rotacionMethod') || 'FIFO';
 
         // Inicializar interfaz
+        this.editId = null; // Estado para edición
         this.inicializar();
     }
 
@@ -112,6 +113,12 @@ class FarmaciaApp {
             btnReduccionMasiva: document.getElementById('btnReduccionMasiva'),
             inputExcel: document.getElementById('inputExcel'),
 
+            // Sync Tools
+            btnExportarCierre: document.getElementById('btnExportarCierre'),
+            btnImportarVentas: document.getElementById('btnImportarVentas'),
+            btnImportarMaster: document.getElementById('btnImportarMaster'),
+            inputSync: document.getElementById('inputSync'),
+
             // Ventas
             inputCodigoBarras: document.getElementById('inputCodigoBarras'),
             selectProductoVenta: document.getElementById('selectProductoVenta'),
@@ -165,6 +172,23 @@ class FarmaciaApp {
         if (this.elementos.btnExportarExcel) this.elementos.btnExportarExcel.addEventListener('click', () => this.exportarExcel());
         if (this.elementos.btnAumentoMasivo) this.elementos.btnAumentoMasivo.addEventListener('click', () => this.aumentoMasivo());
         if (this.elementos.btnReduccionMasiva) this.elementos.btnReduccionMasiva.addEventListener('click', () => this.reduccionMasiva());
+
+        // Sync (Sincronización Multicaja)
+        if (this.elementos.btnExportarCierre) this.elementos.btnExportarCierre.addEventListener('click', () => this.exportarCierreCaja());
+
+        if (this.elementos.btnImportarVentas) {
+            this.elementos.btnImportarVentas.addEventListener('click', () => {
+                this._syncMode = 'CONSOLIDAR_VENTAS';
+                this.elementos.inputSync.click();
+            });
+        }
+        if (this.elementos.btnImportarMaster) {
+            this.elementos.btnImportarMaster.addEventListener('click', () => {
+                this._syncMode = 'ACTUALIZAR_MASTER';
+                this.elementos.inputSync.click();
+            });
+        }
+        if (this.elementos.inputSync) this.elementos.inputSync.addEventListener('change', (e) => this.procesarSync(e));
 
         // Ventas - Código de barras (scanner)
         this.elementos.inputCodigoBarras.addEventListener('keypress', (e) => {
@@ -286,19 +310,53 @@ class FarmaciaApp {
         const stock = parseInt(stockStr);
         if (isNaN(stock) || stock < 0) return this.mostrarError('Stock inválido');
 
-        const nuevoProducto = {
-            id: Date.now(),
-            nombre,
-            codigoBarras: codigoBarras || null,
-            precio,
-            lotes: []
-        };
+        if (this.editId) {
+            // MODO EDICIÓN
+            const producto = this.productos.find(p => p.id === this.editId);
+            if (producto) {
+                producto.nombre = nombre;
+                producto.codigoBarras = codigoBarras || null;
+                producto.precio = precio;
 
-        if (stock > 0) {
-            nuevoProducto.lotes.push({ id: 'lot-' + Date.now(), numero: loteNumero || null, cantidad: stock, fechaIngreso: new Date().toISOString(), vencimiento: vencimientoVal || null });
+                // Si agregaron stock durante la edición, lo sumamos como nuevo lote
+                if (stock > 0) {
+                    if (!producto.lotes) producto.lotes = [];
+                    producto.lotes.push({
+                        id: 'lot-' + Date.now(),
+                        numero: loteNumero || null,
+                        cantidad: stock,
+                        fechaIngreso: new Date().toISOString(),
+                        vencimiento: vencimientoVal || null
+                    });
+                    this.mostrarInfo('Producto actualizado y stock agregado.');
+                } else {
+                    this.mostrarInfo('Datos del producto actualizados.');
+                }
+            }
+            // Reset Estado Edición
+            this.editId = null;
+            this.elementos.btnAgregarProducto.textContent = '➕ Agregar Producto';
+            this.elementos.btnAgregarProducto.classList.remove('btn-warning');
+            this.elementos.btnAgregarProducto.classList.add('btn-success');
+
+        } else {
+            // MODO CREACIÓN (Nuevo)
+            const nuevoProducto = {
+                id: Date.now(),
+                nombre,
+                codigoBarras: codigoBarras || null,
+                precio,
+                lotes: []
+            };
+
+            if (stock > 0) {
+                nuevoProducto.lotes.push({ id: 'lot-' + Date.now(), numero: loteNumero || null, cantidad: stock, fechaIngreso: new Date().toISOString(), vencimiento: vencimientoVal || null });
+            }
+
+            this.productos.push(nuevoProducto);
+            this.mostrarInfo('Producto agregado correctamente');
         }
 
-        this.productos.push(nuevoProducto);
         this.guardarDatos();
 
         // Limpiar form
@@ -310,11 +368,34 @@ class FarmaciaApp {
         if (this.elementos.prodVencimiento) this.elementos.prodVencimiento.value = '';
 
         this.actualizarUI();
-        this.mostrarInfo('Producto agregado correctamente');
+    }
+
+    iniciarEdicion(id) {
+        const prod = this.productos.find(p => p.id === id);
+        if (!prod) return;
+
+        this.editId = id;
+        this.elementos.prodNombre.value = prod.nombre;
+        this.elementos.prodCodigoBarras.value = prod.codigoBarras || '';
+        this.elementos.prodPrecio.value = prod.precio;
+        this.elementos.prodStock.value = ''; // Stock reset
+
+        // Cambiar botón e indicador visual
+        this.elementos.btnAgregarProducto.textContent = '💾 Guardar Cambios';
+        this.elementos.btnAgregarProducto.classList.remove('btn-success');
+        this.elementos.btnAgregarProducto.classList.add('btn-warning');
+
+        this.elementos.prodNombre.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     eliminarProducto(id) {
         this.mostrarConfirmacion('¿Eliminar este producto?', () => {
+            if (this.editId === id) {
+                this.editId = null;
+                this.elementos.btnAgregarProducto.textContent = '➕ Agregar Producto';
+                this.elementos.btnAgregarProducto.classList.replace('btn-warning', 'btn-success');
+            }
             this.productos = this.productos.filter(p => p.id !== id);
             this.guardarDatos();
             this.actualizarUI();
@@ -326,13 +407,15 @@ class FarmaciaApp {
         this.productos.forEach(prod => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${prod.nombre}</td>
+                <td>${prod.nombre}${prod.codigoBarras ? '<br><small>' + prod.codigoBarras + '</small>' : ''}</td>
                 <td>$${prod.precio.toFixed(2)}</td>
                 <td>${this.getStock(prod)}</td>
                 <td>
-                    <button class="btn btn-danger btn-small btn-eliminar-prod" data-id="${prod.id}">🗑️</button>
+                    <button class="btn btn-warning btn-small btn-editar-prod" style="margin-right:5px;">✏️</button>
+                    <button class="btn btn-danger btn-small btn-eliminar-prod">🗑️</button>
                 </td>
             `;
+            tr.querySelector('.btn-editar-prod').addEventListener('click', () => this.iniciarEdicion(prod.id));
             tr.querySelector('.btn-eliminar-prod').addEventListener('click', () => this.eliminarProducto(prod.id));
             this.elementos.listaProductos.appendChild(tr);
         });
@@ -534,6 +617,187 @@ class FarmaciaApp {
         this.actualizarUI();
         const accion = porcentaje >= 0 ? 'actualizaron' : 'redujeron';
         this.mostrarInfo(`Se ${accion} ${contador} productos correctamente.`);
+    }
+
+    // ============================================
+    // SINCRONIZACIÓN MULTICAJA (V3 Compatible)
+    // ============================================
+
+    exportarCierreCaja() {
+        const wb = XLSX.utils.book_new();
+
+        // 1. Sheet Inventario (Con soporte para CodigoBarras)
+        const rowsInv = [];
+        this.productos.forEach(p => {
+            if (p.lotes && p.lotes.length > 0) {
+                p.lotes.forEach(l => {
+                    rowsInv.push({
+                        ID: p.id,
+                        Nombre: p.nombre,
+                        CodigoBarras: p.codigoBarras || '',
+                        Precio: p.precio,
+                        LoteID: l.id,
+                        LoteNum: l.numero || '',
+                        Vto: l.vencimiento || '',
+                        Stock: l.cantidad,
+                        FechaIngreso: l.fechaIngreso
+                    });
+                });
+            } else {
+                rowsInv.push({
+                    ID: p.id,
+                    Nombre: p.nombre,
+                    CodigoBarras: p.codigoBarras || '',
+                    Precio: p.precio,
+                    LoteID: '',
+                    LoteNum: '',
+                    Vto: '',
+                    Stock: 0,
+                    FechaIngreso: ''
+                });
+            }
+        });
+        const wsInv = XLSX.utils.json_to_sheet(rowsInv);
+        XLSX.utils.book_append_sheet(wb, wsInv, "Inventario");
+
+        // 2. Sheet Ventas (Usando historialVentas y detalleConsumo)
+        const rowsVentas = [];
+        this.historialVentas.forEach(v => {
+            if (v.detalleConsumo) {
+                v.detalleConsumo.forEach(prod => {
+                    if (prod.detalle) {
+                        prod.detalle.forEach(det => {
+                            rowsVentas.push({
+                                VentaID: v.id,
+                                Fecha: v.fecha,
+                                Paciente: v.paciente,
+                                Documento: v.documento,
+                                ProductoNombre: prod.nombre,
+                                LoteID: det.loteId,
+                                NumeroLote: det.numero,
+                                Cantidad: det.cantidad,
+                                Subtotal: 0
+                            });
+                        });
+                    }
+                });
+            }
+        });
+        const wsVentas = XLSX.utils.json_to_sheet(rowsVentas);
+        XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas");
+
+        const fecha = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `Cierre_Caja_${fecha}.xlsx`);
+    }
+
+    procesarSync(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+
+                if (this._syncMode === 'CONSOLIDAR_VENTAS') {
+                    this.consolidarVentasDesdeExcel(workbook);
+                } else if (this._syncMode === 'ACTUALIZAR_MASTER') {
+                    this.actualizarInventarioDesdeMaster(workbook);
+                }
+                event.target.value = '';
+            } catch (error) {
+                console.error(error);
+                this.mostrarError('Error de sincronización.');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+
+    consolidarVentasDesdeExcel(workbook) {
+        if (!workbook.Sheets["Ventas"]) return this.mostrarError('Falta hoja Ventas');
+        const rawVentas = XLSX.utils.sheet_to_json(workbook.Sheets["Ventas"]);
+
+        let contador = 0;
+
+        // Group by VentaID
+        const ventasExternas = {};
+        rawVentas.forEach(row => {
+            if (!ventasExternas[row.VentaID]) ventasExternas[row.VentaID] = { id: row.VentaID, fecha: row.Fecha, rows: [] };
+            ventasExternas[row.VentaID].rows.push(row);
+        });
+
+        Object.values(ventasExternas).forEach(vExt => {
+            const existe = this.historialVentas.find(h => h.id == vExt.id);
+            if (!existe) {
+                contador++;
+                // Add to history (minimal placeholder to prevent re-import)
+                this.historialVentas.push({
+                    id: vExt.id,
+                    fecha: vExt.fecha,
+                    paciente: 'Consolidado Externo',
+                    items: [],
+                    total: 0 // No sumamos al total financiero local, solo descontamos stock? 
+                    // Opcional: Sumar a ventasTotales si queremos contabilidad centralizada.
+                });
+                // Asumimos contabilidad centralizada:
+                // this.ventasTotales += 0; // Depende si el usuario quiere mezclar cajas. Mejor solo Stock por ahora para seguridad.
+
+                // Deduct Stock
+                vExt.rows.forEach(r => {
+                    for (const p of this.productos) {
+                        if (p.lotes) {
+                            const l = p.lotes.find(lot => lot.id == r.LoteID);
+                            if (l) {
+                                l.cantidad -= r.Cantidad;
+                                if (l.cantidad < 0) l.cantidad = 0;
+                                break;
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+        this.guardarDatos();
+        this.actualizarUI();
+        this.mostrarInfo(`Se consolidaron ventas de ${contador} tickets externos.`);
+    }
+
+    actualizarInventarioDesdeMaster(workbook) {
+        if (!workbook.Sheets["Inventario"]) return this.mostrarError('Falta hoja Inventario');
+        const rawInv = XLSX.utils.sheet_to_json(workbook.Sheets["Inventario"]);
+
+        this.mostrarConfirmacion('¿Sobreescribir inventario local con archivo Master?', () => {
+            const prodsMap = {};
+
+            rawInv.forEach(row => {
+                const pid = row.ID;
+                if (!prodsMap[pid]) {
+                    prodsMap[pid] = {
+                        id: pid,
+                        nombre: row.Nombre,
+                        codigoBarras: row.CodigoBarras,
+                        precio: row.Precio,
+                        lotes: []
+                    };
+                }
+                if (row.LoteID) {
+                    prodsMap[pid].lotes.push({
+                        id: row.LoteID,
+                        numero: row.LoteNum,
+                        vencimiento: row.Vto,
+                        cantidad: row.Stock,
+                        fechaIngreso: row.FechaIngreso || new Date().toISOString()
+                    });
+                }
+            });
+
+            this.productos = Object.values(prodsMap);
+            this.guardarDatos();
+            this.actualizarUI();
+            this.mostrarInfo('Inventario local actualizado desde Master');
+        });
     }
 
     // ============================================

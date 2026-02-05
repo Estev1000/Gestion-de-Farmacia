@@ -107,13 +107,40 @@
                         </div>
                     </div>
 
-                    <!-- Excel Toolbar (Added back) -->
+                    <!-- Excel Toolbar (Standard) -->
                     <div class="toolbar-excel" style="margin-bottom: 20px; display: flex; gap: 10px;">
-                        <button id="btnImportarExcel" class="btn btn-secondary">📂 Importar Excel</button>
-                        <button id="btnExportarExcel" class="btn btn-success">💾 Exportar Excel</button>
+                        <button id="btnImportarExcel" class="btn btn-secondary">📂 Importar Excel (Stock)</button>
+                        <button id="btnExportarExcel" class="btn btn-success">💾 Exportar Inventario</button>
                         <button id="btnAumentoMasivo" class="btn btn-warning">📈 Aumento %</button>
                         <button id="btnReduccionMasiva" class="btn btn-warning">📉 Reducción %</button>
-                        <input type="file" id="inputExcel" accept=".xlsx, .xls, .csv" style="display: none;">
+                    </div>
+
+                    <!-- Sync Toolbar (New Feature) -->
+                    <div class="toolbar-sync"
+                        style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <h4 style="margin-top: 0; margin-bottom: 10px; color: var(--color-primary);">🔄 Sincronización
+                            Multicaja</h4>
+                        <p style="font-size: 0.9em; margin-bottom: 10px; color: #666;">
+                            Use estas herramientas para trabajar con varias computadoras. <strong>El archivo de Cierre
+                                es "Todo en Uno" (Incluye Ventas e Inventario).</strong>
+                        </p>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="btnExportarCierre" class="btn btn-primary"
+                                title="Genera un archivo ÚNICO que contiene Ventas e Inventario">
+                                📤 Exportar Cierre (Ventas + Inventario)
+                            </button>
+                            <div style="border-left: 2px solid #ccc; padding-left: 10px; display: flex; gap: 10px;">
+                                <button id="btnImportarVentas" class="btn btn-info"
+                                    title="Carga ventas de otras cajas y descuenta stock local">
+                                    📥 1. Consolidar Ventas (Central)
+                                </button>
+                                <button id="btnImportarMaster" class="btn btn-danger"
+                                    title="Actualiza todo el inventario desde el archivo central consolidado">
+                                    📥 2. Actualizar Inventario (Sucursal)
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" id="inputSync" accept=".xlsx, .xls" style="display: none;">
                     </div>
 
                     <div class="tabla-container">
@@ -292,6 +319,18 @@
                     <p class="section-subtitle">Guía completa para usar el sistema</p>
 
                     <div class="manual-container">
+
+                        <!-- Botón Manual Multicaja -->
+                        <div
+                            style="margin-bottom: 20px; text-align: center; padding: 15px; background: #e3f2fd; border-radius: 8px; border: 1px solid #90caf9;">
+                            <h3 style="color: #1976d2; margin-top:0;">📘 Nuevo: Manual de Sincronización</h3>
+                            <p>Aprende a conectar varias cajas, exportar datos y consolidar ventas.</p>
+                            <a href="manual_usuario.html" target="_blank" class="btn btn-primary"
+                                style="text-decoration: none; font-size: 1.1em;">
+                                🔗 Abrir Manual Multicaja Paso a Paso
+                            </a>
+                        </div>
+
                         <!-- Índice -->
                         <div class="manual-index">
                             <h3>📑 Índice Rápido</h3>

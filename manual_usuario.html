@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Gestión de Farmacia Multicaja</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--primary);
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--accent);
+        }
+
+        .step {
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 3px solid #ddd;
+        }
+
+        .btn-ref {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: white;
+        }
+
+        .btn-blue {
+            background-color: var(--accent);
+        }
+
+        .btn-green {
+            background-color: var(--success);
+        }
+
+        .btn-red {
+            background-color: var(--danger);
+        }
+
+        .btn-orange {
+            background-color: var(--warning);
+        }
+
+        code {
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .alert {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ffeeba;
+            margin-top: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .workflow-diagram {
+            text-align: center;
+            background: #eef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📘 Manual de Sincronización Multicaja</h1>
+    <p style="text-align: center; font-size: 1.1em;">Guía paso a paso para administrar las ventas e inventario entre
+        varias computadoras.</p>
+
+    <div class="section" id="intro">
+        <h2>🔄 ¿Cómo funciona el sistema?</h2>
+        <p>Este sistema permite que varias computadoras (Cajas) trabajen durante el día de forma independiente. Al
+            finalizar la jornada, se utiliza un sistema de <strong>archivos Excel</strong> para juntar toda la
+            información en una computadora principal (Central) y luego redistribuir el stock actualizado a todas las
+            demás.</p>
+        <p><strong>Roles:</strong></p>
+        <ul>
+            <li><strong>💻 Cajas / Sucursales:</strong> Computadoras que venden durante el día.</li>
+            <li><strong>🖥️ Central / Master:</strong> Computadora principal que recibe los datos, consolida la
+                contabilidad y controla el stock real.</li>
+        </ul>
+    </div>
+
+    <div class="section" id="paso1">
+        <h2>1️⃣ Fin del Día: En las Cajas (Sucursales)</h2>
+        <p>Al terminar el turno o el día de trabajo, cada vendedor debe realizar la exportación de su cierre.</p>
+
+        <div class="step">
+            <h3>Paso A: Generar el Archivo</h3>
+            <p>1. Vaya a la pestaña <strong>Inventario</strong>.</p>
+            <p>2. Busque la sección "Sincronización Multicaja".</p>
+            <p>3. Haga clic en el botón azul: <span class="btn-ref btn-blue">📤 Exportar Cierre de Caja</span>.</p>
+            <p>4. Se descargará un archivo llamado <code>Cierre_Caja_FECHA.xlsx</code>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Paso B: Enviar al Mail</h3>
+            <p>1. Abra su correo electrónico.</p>
+            <p>2. Redacte un nuevo correo dirigido a la cuenta de la <strong>Central</strong>.</p>
+            <p>3. <strong>Adjunte el archivo Excel</strong> que se acaba de descargar.</p>
+            <p>4. Envíe el correo.</p>
+        </div>
+
+        <div class="alert">
+            ⚠️ <strong>Importante:</strong> Si tiene 3 cajas, la Central deberá recibir 3 correos (o uno con 3 archivos
+            adjuntos) al final del día.
+        </div>
+    </div>
+
+    <div class="section" id="paso2">
+        <h2>2️⃣ Consolidación: En la Central (Master)</h2>
+        <p>El encargado abre la computadora Central para unificar las ventas y actualizar el stock global.</p>
+
+        <div class="step">
+            <h3>Paso A: Descargar Archivos</h3>
+            <p>1. Abra el correo de la farmacia.</p>
+            <p>2. Descargue todos los archivos <code>Cierre_Caja...xlsx</code> que enviaron las otras cajas.</p>
+            <p>3. Guárdelos en una carpeta fácil de encontrar (ej: "Cierres del Día").</p>
+        </div>
+
+        <div class="step">
+            <h3>Paso B: Cargar Ventas al Sistema</h3>
+            <p>1. En la PC Central, vaya a <strong>Inventario</strong> > <strong>Sincronización Multicaja</strong>.</p>
+            <p>2. Haga clic en el botón celeste: <span class="btn-ref btn-blue" style="background-color:#17a2b8;">📥 1.
+                    Consolidar Ventas</span>.</p>
+            <p>3. Seleccione el primer archivo Excel que descargó.</p>
+            <p>4. El sistema leerá las ventas, sumará la caja y <strong>descontará el stock</strong> correspondiente.
+            </p>
+            <p>5. <strong>Repita</strong> este proceso con cada archivo de las otras cajas.</p>
+        </div>
+    </div>
+
+    <div class="section" id="paso3">
+        <h2>3️⃣ Actualización: Distribución del Stock Real</h2>
+        <p>Ahora la computadora Central tiene la verdad absoluta: sumó todas las ventas y sabe cuánto stock queda
+            realmente. Es hora de decirle a las demás cajas cuánto stock tienen para mañana.</p>
+
+        <div class="step">
+            <h3>Paso A: Generar Archivo Maestro</h3>
+            <p>1. En la PC Central (que ya tiene todo cargado), haga clic nuevamente en <span
+                    class="btn-ref btn-blue">📤 Exportar Cierre de Caja</span>.</p>
+            <p>2. Este nuevo archivo ahora funciona como un <strong>"Archivo Maestro"</strong>.</p>
+        </div>
+
+        <div class="step">
+            <h3>Paso B: Enviar a Sucursales</h3>
+            <p>1. Envíe este archivo por correo a todas las demás computadoras.</p>
+        </div>
+    </div>
+
+    <div class="section" id="paso4">
+        <h2>4️⃣ Inicio del Día Siguiente: En las Cajas</h2>
+        <p>Antes de empezar a vender, las cajas deben actualizarse para no vender productos que ya no tienen stock.</p>
+
+        <div class="step">
+            <h3>Paso Único: Cargar Inventario</h3>
+            <p>1. Descargue el "Archivo Maestro" del correo.</p>
+            <p>2. Vaya a <strong>Inventario</strong> > <strong>Sincronización Multicaja</strong>.</p>
+            <p>3. Haga clic en el botón rojo: <span class="btn-ref btn-red">📥 2. Actualizar Inventario</span>.</p>
+            <p>4. Seleccione el archivo Maestro.</p>
+            <p>5. Confirme la operación. <strong>¡Listo!</strong> Su inventario es idéntico al de la central.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>✏️ Edición de Productos</h2>
+        <p>Si necesita corregir un precio o nombre:</p>
+        <ol>
+            <li>En la tabla de productos, busque el botón amarillo ✏️ (Lápiz).</li>
+            <li>Los datos subirán al formulario principal.</li>
+            <li>Modifique lo que necesite (Precio, Nombre, Código).</li>
+            <li>Si ingresa un valor en <strong>Stock</strong>, se sumará; si lo deja vacío, solo cambiará los datos.
+            </li>
+            <li>Presione <span class="btn-ref btn-orange">💾 Guardar Cambios</span>.</li>
+        </ol>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; font-size: 0.8em; color: #777;">
+        Gestión de Farmacia V3 - Sistema Multicaja
+    </footer>
+
+</body>
+
+</html>
