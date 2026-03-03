@@ -89,6 +89,8 @@ class FarmaciaApp {
         this.setupElementos();
         this.configurarEventos();
         this.actualizarUI();
+        // Verificar alertas de vencimiento al iniciar
+        this.verificarAlertasVencimiento();
         // Verificar estado premium (si se activó por link o localStorage)
         try { this.checkPremiumStatus(); } catch (e) { /* silent */ }
     }
@@ -117,6 +119,7 @@ class FarmaciaApp {
             btnExportarCierre: document.getElementById('btnExportarCierre'),
             btnImportarVentas: document.getElementById('btnImportarVentas'),
             btnImportarMaster: document.getElementById('btnImportarMaster'),
+            btnDistribuirStock: document.getElementById('btnDistribuirStock'), // Nuevo
             inputSync: document.getElementById('inputSync'),
 
             // Ventas
@@ -159,6 +162,16 @@ class FarmaciaApp {
             btnSuscribirBasico: document.getElementById('btnSuscribirBasico'),
             btnSuscribirEstandar: document.getElementById('btnSuscribirEstandar'),
             btnSuscribirGratis: document.getElementById('btnSuscribirGratis'),
+
+            // Reportes
+            btnReporteStock: document.getElementById('btnReporteStock'),
+            btnReporteDispensas: document.getElementById('btnReporteDispensas'),
+            btnAlertasStock: document.getElementById('btnAlertasStock'),
+            contenedorReportes: document.getElementById('contenedorReportes'),
+            tablaReportes: document.getElementById('tablaReportes'),
+            headerReportes: document.getElementById('headerReportes'),
+            bodyReportes: document.getElementById('bodyReportes'),
+            footerReportes: document.getElementById('footerReportes'),
         };
     }
 
@@ -187,6 +200,9 @@ class FarmaciaApp {
                 this._syncMode = 'ACTUALIZAR_MASTER';
                 this.elementos.inputSync.click();
             });
+        }
+        if (this.elementos.btnDistribuirStock) {
+            this.elementos.btnDistribuirStock.addEventListener('click', () => this.distribuirStock());
         }
         if (this.elementos.inputSync) this.elementos.inputSync.addEventListener('change', (e) => this.procesarSync(e));
 
@@ -253,6 +269,11 @@ class FarmaciaApp {
                 }, 300);
             });
         }
+
+        // Eventos Reportes
+        if (this.elementos.btnReporteStock) this.elementos.btnReporteStock.addEventListener('click', () => this.generarReporteStock());
+        if (this.elementos.btnReporteDispensas) this.elementos.btnReporteDispensas.addEventListener('click', () => this.generarReporteDispensas());
+        if (this.elementos.btnAlertasStock) this.elementos.btnAlertasStock.addEventListener('click', () => this.generarAlertasVencimiento());
 
         // Copiar link de soporte (Formspree) y cerrar modal
         const copyBtn = document.getElementById('supportCopyLink');
@@ -462,7 +483,7 @@ class FarmaciaApp {
 
             const consumir = Math.min(disponible, restante);
             lote.cantidad = disponible - consumir;
-            detalle.push({ loteId: lote.id, numero: lote.numero, cantidad: consumir });
+            detalle.push({ loteId: lote.id, numero: lote.numero, cantidad: consumir, vencimiento: lote.vencimiento });
             restante -= consumir;
 
             if (lote.cantidad === 0) {
@@ -798,6 +819,92 @@ class FarmaciaApp {
             this.actualizarUI();
             this.mostrarInfo('Inventario local actualizado desde Master');
         });
+    }
+
+    distribuirStock() {
+        const numCajasStr = prompt("¿En cuántas cajas desea dividir el stock? (Ej: 2, 3...)\nEsto generará archivos separados para cada caja.");
+        if (!numCajasStr) return;
+
+        const numCajas = parseInt(numCajasStr);
+        if (isNaN(numCajas) || numCajas < 2 || numCajas > 10) {
+            return this.mostrarError("Ingrese un número válido entre 2 y 10.");
+        }
+
+        this.mostrarConfirmacion(`¿Desea generar ${numCajas} archivos de Excel dividiendo el stock equitativamente?\nDeberá cargar el 'Archivo 1' en esta PC y los demás en las otras.`, () => {
+            this.procesarDistribucion(numCajas);
+        });
+    }
+
+    procesarDistribucion(numCajas) {
+        // Crear N arrays para N cajas
+        const inventarios = Array.from({ length: numCajas }, () => []);
+
+        this.productos.forEach(p => {
+            // Prepare product base info
+            const baseProd = {
+                ID: p.id,
+                Nombre: p.nombre,
+                CodigoBarras: p.codigoBarras || '',
+                Precio: p.precio
+            };
+
+            if (p.lotes && p.lotes.length > 0) {
+                p.lotes.forEach(l => {
+                    const totalCantidad = l.cantidad;
+                    const baseCantidad = Math.floor(totalCantidad / numCajas);
+                    let resto = totalCantidad % numCajas;
+
+                    // Distribuir en N inventarios
+                    for (let i = 0; i < numCajas; i++) {
+                        let cantidadAsignada = baseCantidad;
+                        if (resto > 0) {
+                            cantidadAsignada++;
+                            resto--;
+                        }
+
+                        // Agregar siempre para mantener la estructura, incluso si es 0
+                        inventarios[i].push({
+                            ...baseProd,
+                            LoteID: l.id,
+                            LoteNum: l.numero || '',
+                            Vto: l.vencimiento || '',
+                            Stock: cantidadAsignada,
+                            FechaIngreso: l.fechaIngreso
+                        });
+                    }
+                });
+            } else {
+                // Producto sin lotes, agregar con stock 0
+                for (let i = 0; i < numCajas; i++) {
+                    inventarios[i].push({
+                        ...baseProd,
+                        LoteID: '', LoteNum: '', Vto: '', Stock: 0, FechaIngreso: ''
+                    });
+                }
+            }
+        });
+
+        // Generar y descargar Archivos secuencialmente
+        inventarios.forEach((datos, index) => {
+            setTimeout(() => {
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(datos);
+                    XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+
+                    const fecha = new Date().toISOString().split('T')[0];
+                    // Nombres claros: Caja 1 (Master), Caja 2...
+                    const suffix = `Caja_${index + 1}`;
+                    const nombreArchivo = `Inventario_Distribuido_${suffix}_${fecha}.xlsx`;
+
+                    XLSX.writeFile(wb, nombreArchivo);
+                } catch (err) {
+                    console.error("Error generating file " + index, err);
+                }
+            }, index * 1500); // Delay 1.5s
+        });
+
+        this.mostrarInfo(`Se están descargando ${numCajas} archivos...<br>Recuerde importar el Archivo (Caja 1) en esta PC.`);
     }
 
     // ============================================
@@ -1205,12 +1312,12 @@ class FarmaciaApp {
         const accessCode = urlParams.get('access');
 
         // Verificar códigos de activación desde URL
-        if (accessCode === 'farmacia_basic_2026') {
+        if (accessCode === 'farmacia_basic_febrero_2026') {
             localStorage.setItem('farmacia_premium_active', 'basic');
             localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
             window.history.replaceState({}, document.title, window.location.pathname);
             this.mostrarInfo('¡Pago Exitoso! Plan <strong>Básico</strong> activado. 🎉');
-        } else if (accessCode === 'farmacia_pro_2026') {
+        } else if (accessCode === 'farmacia_pro_febrero_2026') {
             localStorage.setItem('farmacia_premium_active', 'pro');
             localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -1258,6 +1365,185 @@ class FarmaciaApp {
             }
         }
     }
+
+    // ============================================
+    // REPORTES
+    // ============================================
+
+    limpiarTablaReportes() {
+        if (this.elementos.tablaReportes) {
+            this.elementos.tablaReportes.style.display = 'table';
+            this.elementos.headerReportes.innerHTML = '';
+            this.elementos.bodyReportes.innerHTML = '';
+            this.elementos.footerReportes.innerHTML = '';
+        }
+    }
+
+    generarReporteStock() {
+        this.limpiarTablaReportes();
+
+        // Cabecera
+        this.elementos.headerReportes.innerHTML = `
+            <tr>
+                <th>Producto</th>
+                <th>Lote</th>
+                <th>Vencimiento</th>
+                <th>Stock</th>
+                <th>Precio Unit.</th>
+                <th>Total ($)</th>
+            </tr>
+        `;
+
+        let valorizacionTotal = 0;
+
+        // Cuerpo: Recorrer productos y sus lotes
+        this.productos.forEach(p => {
+            if (p.lotes && p.lotes.length > 0) {
+                p.lotes.forEach(l => {
+                    if (l.cantidad > 0) {
+                        const subtotal = l.cantidad * p.precio;
+                        valorizacionTotal += subtotal;
+
+                        const tr = document.createElement('tr');
+                        const vto = l.vencimiento ? l.vencimiento : 'S/V';
+                        const isVencido = l.vencimiento && new Date(l.vencimiento) < new Date();
+
+                        tr.innerHTML = `
+                            <td>${p.nombre}</td>
+                            <td>${l.numero || 'Generico'}</td>
+                            <td style="${isVencido ? 'color:red;font-weight:bold;' : ''}">${vto}</td>
+                            <td>${l.cantidad}</td>
+                            <td>$${p.precio.toFixed(2)}</td>
+                            <td>$${subtotal.toFixed(2)}</td>
+                        `;
+                        this.elementos.bodyReportes.appendChild(tr);
+                    }
+                });
+            }
+        });
+
+        // Pie
+        this.elementos.footerReportes.innerHTML = `
+            <tr class="total-row">
+                <td colspan="5" style="text-align:right">VALORIZACIÓN TOTAL:</td>
+                <td>$${valorizacionTotal.toFixed(2)}</td>
+            </tr>
+        `;
+    }
+
+    generarReporteDispensas() {
+        this.limpiarTablaReportes();
+
+        this.elementos.headerReportes.innerHTML = `
+            <tr>
+                <th>Fecha</th>
+                <th>Paciente</th>
+                <th>Producto</th>
+                <th>Lote</th>
+                <th>Vencimiento</th>
+                <th>Cant.</th>
+            </tr>
+        `;
+
+        const ventasOrdenadas = [...this.historialVentas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        ventasOrdenadas.forEach(v => {
+            if (v.detalleConsumo) {
+                v.detalleConsumo.forEach(prodItem => {
+                    if (prodItem.detalle) {
+                        prodItem.detalle.forEach(det => {
+                            const tr = document.createElement('tr');
+                            tr.innerHTML = `
+                                <td>${new Date(v.fecha).toLocaleDateString()}</td>
+                                <td>${v.paciente}</td>
+                                <td>${prodItem.nombre}</td>
+                                <td>${det.numero || 'S/L'}</td>
+                                <td>${det.vencimiento || 'S/V'}</td>
+                                <td>${det.cantidad}</td>
+                            `;
+                            this.elementos.bodyReportes.appendChild(tr);
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    generarAlertasVencimiento() {
+        this.limpiarTablaReportes();
+
+        this.elementos.headerReportes.innerHTML = `
+            <tr>
+                <th>Producto</th>
+                <th>Lote</th>
+                <th>Vencimiento</th>
+                <th>Días Restantes</th>
+                <th>Estado</th>
+            </tr>
+        `;
+
+        const hoy = new Date();
+        let alertas = 0;
+
+        this.productos.forEach(p => {
+            if (p.lotes) {
+                p.lotes.forEach(l => {
+                    if (l.cantidad > 0 && l.vencimiento) {
+                        const vto = new Date(l.vencimiento);
+                        const diffTime = vto - hoy;
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                        let estado = '';
+                        let clase = '';
+
+                        if (diffDays < 0) {
+                            estado = 'VENCIDO';
+                            clase = 'alert-urgent';
+                        } else if (diffDays <= 30) {
+                            estado = 'Por Vencer';
+                            clase = 'alert-warning';
+                        }
+
+                        if (estado) {
+                            alertas++;
+                            const tr = document.createElement('tr');
+                            if (clase) tr.className = clase;
+                            tr.innerHTML = `
+                                <td>${p.nombre}</td>
+                                <td>${l.numero || 'Generico'}</td>
+                                <td>${l.vencimiento}</td>
+                                <td>${diffDays}</td>
+                                <td>${estado}</td>
+                            `;
+                            this.elementos.bodyReportes.appendChild(tr);
+                        }
+                    }
+                });
+            }
+        });
+
+        if (alertas === 0) {
+            this.elementos.bodyReportes.innerHTML = '<tr><td colspan="5" style="text-align:center">✅ No hay productos vencidos ni próximos a vencer (30 días).</td></tr>';
+        }
+    }
+
+    verificarAlertasVencimiento() {
+        const hoy = new Date();
+        const tieneRiesgos = this.productos.some(p =>
+            p.lotes && p.lotes.some(l => {
+                if (l.cantidad <= 0 || !l.vencimiento) return false;
+                const vto = new Date(l.vencimiento);
+                const diffDays = (vto - hoy) / (1000 * 60 * 60 * 24);
+                return diffDays <= 30;
+            })
+        );
+
+        if (tieneRiesgos) {
+            setTimeout(() => {
+                this.mostrarInfo('⚠️ <strong>Atención:</strong> Hay productos vencidos o próximos a vencer.<br>Ver pestaña Reportes.');
+            }, 1000);
+        }
+    }
 }
 
 // ============================================
@@ -1270,12 +1556,12 @@ window.activarConCodigo = function (code) {
     }
 
     // Validar y activar según el código
-    if (code === 'farmacia_basic_2026') {
+    if (code === 'farmacia_basic_febrero_2026') {
         localStorage.setItem('farmacia_premium_active', 'basic');
         localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
         alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nLa página se recargará para aplicar los cambios.");
         location.reload();
-    } else if (code === 'farmacia_pro_2026') {
+    } else if (code === 'farmacia_pro_febrero_2026') {
         localStorage.setItem('farmacia_premium_active', 'pro');
         localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
         alert("¡Felicidades! Plan PRO Activado. 🚀\n\nLa página se recargará para aplicar los cambios.");
@@ -1295,12 +1581,12 @@ window.enterProCode = function () {
     const codeTrimmed = code.trim();
 
     // Validar códigos de activación
-    if (codeTrimmed === 'farmacia_basic_2026') {
+    if (codeTrimmed === 'farmacia_basic_febrero_2026') {
         localStorage.setItem('farmacia_premium_active', 'basic');
         localStorage.setItem('farmacia_premium_plan', 'Básico - $8.000 ARS');
         alert("¡Felicidades! Plan BÁSICO Activado. 🎉\n\nRecarga la página para aplicar los cambios.");
         location.reload();
-    } else if (codeTrimmed === 'farmacia_pro_2026') {
+    } else if (codeTrimmed === 'farmacia_pro_febrero_2026') {
         localStorage.setItem('farmacia_premium_active', 'pro');
         localStorage.setItem('farmacia_premium_plan', 'Pro - $15.000 ARS');
         alert("¡Felicidades! Plan PRO Activado. 🚀\n\nRecarga la página para aplicar los cambios.");
